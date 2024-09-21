@@ -15,6 +15,13 @@ def install(url:str):
     audio.download(filename=fn+".mp3")
     return fn
 
+def install_nogui(url:str):
+    yt = YouTube(url, on_progress_callback=progress_function)
+    fn = f"storage/{time.time()}"
+    audio = yt.streams.filter(only_audio=True).first()
+    audio.download(filename=fn+".mp3")
+    return fn
+
 def clear(folder_path):
     if os.path.exists(folder_path) and os.path.isdir(folder_path):
         for filename in os.listdir(folder_path):

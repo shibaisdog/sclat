@@ -1,1 +1,1 @@
-python ./window.py
+options.bat --nogui
