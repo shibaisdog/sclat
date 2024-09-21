@@ -1,0 +1,4 @@
+pygame == 2.5.2
+pytubefix == 6.16.3
+ffmpeg-python == 0.2.0
+opencv-python == 4.6.0.66
