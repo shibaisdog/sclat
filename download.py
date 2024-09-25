@@ -23,6 +23,8 @@ def install_nogui(url:str):
     return fn
 
 def clear(folder_path):
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
     if os.path.exists(folder_path) and os.path.isdir(folder_path):
         for filename in os.listdir(folder_path):
             file_path = os.path.join(folder_path, filename)
