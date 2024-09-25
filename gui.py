@@ -8,6 +8,7 @@ def run(url:str):
     global volume
     pygame.init()
     pygame.mixer.init()
+    pygame.mixer.music.set_volume(volume/100)
     font = pygame.font.Font(None, 25)
     download.clear("storage")
     fn = download.install(url)
