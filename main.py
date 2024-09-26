@@ -1,5 +1,6 @@
 import sys,time
-import gui,nogui
+from src import gui, nogui
+
 args = sys.argv[1:]
 
 nogui_op = False

@@ -1,14 +1,14 @@
 import ffmpeg
 import cv2
 import pygame
-import download
+from src.down import download
 import time
 
 def run(url:str):
     pygame.init()
     pygame.mixer.init()
     
-    download.clear("storage")
+    download.clear("./src/down/storage/")
     fn = download.install_nogui(url)
     ffmpeg.input(fn+".mp3").output(fn+".wav").run(overwrite_output=True)
     sound = pygame.mixer.Sound(fn+".wav")
