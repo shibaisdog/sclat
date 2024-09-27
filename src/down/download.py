@@ -17,7 +17,7 @@ def progress_function(stream, chunk, bytes_remaining):
     on_progress(stream, chunk, bytes_remaining)
     src.win.screen.load = 1
     src.win.screen.reset((stream.width,stream.height))
-    pygame.display.set_caption(f"({percentage:.2f}%)")
+    pygame.display.set_caption(f"Downloading: {convert_size(bytes_downloaded)} of {convert_size(total_size)} ({percentage:.2f}%)")
     text_surface = src.win.screen.font.render(f"Downloading: {convert_size(bytes_downloaded)} of {convert_size(total_size)} ({percentage:.2f}%)", True, (255,255,255))
     text_rect = text_surface.get_rect(center=(int(stream.width/2),int(stream.height/2)))
     src.win.screen.win.blit(text_surface, text_rect)

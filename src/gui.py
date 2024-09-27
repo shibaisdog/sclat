@@ -48,6 +48,10 @@ def run(url:str):
                     text_rect = text_surface.get_rect(center=(80,10)) 
                     src.win.screen.win.blit(text_surface, text_rect)
                 pygame.display.update()
+                current_time = src.win.screen.vid.get_pos()
+                total_length = src.win.screen.vid.duration
+                caps = f"[{current_time:.2f}s / {total_length:.2f}s] {src.win.screen.vid.name}"
+                pygame.display.set_caption(caps)
         pygame.time.wait(16)
     src.win.screen.vid.close()
     download.clear(fns)
