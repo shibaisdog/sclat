@@ -1,6 +1,6 @@
 import sys,time
 from src import gui, nogui
-
+import src.win.screen
 args = sys.argv[1:]
 
 nogui_op = False
@@ -20,9 +20,10 @@ for arg in args:
         playlist_op = True
 
 while True:
-    if len(playlist_url) == 0:
+    src.win.screen.load = 0
+    if len(playlist_url) == 0 and nogui_op:
         url = input("Please enter the URL to play the video (youtube url) : ")
-    else:
+    elif nogui_op:
         url = playlist_url[0]
         playlist_url.remove(url)
     if nogui_op:
@@ -39,17 +40,7 @@ while True:
                 time.sleep(0.5)
                 trys += 1
     else:
-        trys = 0
-        while True:
-            try:
-                gui.run(url)
-                break
-            except Exception as e:
-                if trys >= 10:
-                    print("fail")
-                    break
-                print(f"An error occurred during playback. Trying again... ({trys}/10) > \n{e}")
-                time.sleep(0.5)
-                trys += 1
+        gui.wait()
+        break
     if once_op:
         break

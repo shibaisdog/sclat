@@ -1,3 +1,5 @@
+## [중요! : pytubefix 버전이 7.1rc2 이여야지만 스트리밍 영상을 다운받을수있어요]
+
 ## [options]
 - `--nogui` : `Only plays audio`
 - `--once` : `Play once and quit`

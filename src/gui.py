@@ -1,192 +1,117 @@
-
-import ffmpeg
-import cv2
-import pygame
+import pygame,time
+import pygame.scrap
+from pyvidplayer2 import Video
+################################
 from src.down import download
-import time
-
-
-
-
-# volume = 20
-# def run(url:str):
-#     global volume
-#     pygame.init()
-#     pygame.mixer.init()
-#     pygame.mixer.music.set_volume(volume/100)
-#     font = pygame.font.Font(None, 25)
-#     download.clear("./src/down/storage/")
-#     fn = download.install(url)
-#     cap = cv2.VideoCapture(fn+".mp4")
-#     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-#     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-#     screen = pygame.display.set_mode((width, height))
-#     pygame.display.set_caption(url)
-#     clock = pygame.time.Clock()
-#     fps = cap.get(cv2.CAP_PROP_FPS)
-#     # clock = pygame.time.Clock()
-#     running = True
-#     ffmpeg.input(fn+".mp3").output(fn+".wav").run(overwrite_output=True)
-#     pygame.mixer.music.load(fn+".wav")
-#     pygame.mixer.music.play()
-#     msg_vl_info = 0
-#     while running:
-#         ret, frame = cap.read()
-#         if not ret:
-#             break 
-
-
-
-
-#         frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
-#         frame = cv2.flip(frame, 0)
-#         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-#         frame = pygame.surfarray.make_surface(frame)
-#         screen.blit(frame, (0, 0))
-#         if time.time() - msg_vl_info <= 2:
-#             text_surface = font.render(f"Set Volume > {volume}%", True, (255,255,255))
-#             text_rect = text_surface.get_rect(center=(80,10)) 
-#             screen.blit(text_surface, text_rect)
-#         pygame.display.update()
-#         for event in pygame.event.get():
-#             if event.type == pygame.QUIT:
-#                 running = False
-#             if event.type == pygame.KEYDOWN:
-#                 if event.key == pygame.K_UP:
-#                     msg_vl_info = time.time()
-#                     if volume < 100:
-#                         volume += 10
-#                         pygame.mixer.music.set_volume(volume/100)
-#                 elif event.key == pygame.K_DOWN:
-#                     msg_vl_info = time.time()
-#                     if volume > 0:
-#                         volume -= 10
-#                         pygame.mixer.music.set_volume(volume/100)
-#             elif event.type == pygame.WINDOWMINIMIZED:
-#                 # 창이 최소화 되었을 때 (처리할 게 없으면 최소한의 일을 진행)
-#                 pygame.display.flip()
-#             elif event.type == pygame.WINDOWFOCUSLOST:
-#                 pygame.display.flip()
-
-#         clock.tick(fps)
-
-#     cap.release()
-#     pygame.display.update()
-#     pygame.display.flip()
-#     pygame.init()
-#     pygame.mixer.init()
-#     # pygame.quit()
-
-
-
-import pygame
-from pyvidplayer2 import Video, PostProcessing
-
-
-
-
-volume = 10
+import src.win.screen
+import src.win.setting
+search = ""
 def run(url:str):
-    global volume
-# create video object
-    # download.clear("./src/down/storage/")
     fns, fn = download.install(url)
-    # cap = cv2.VideoCapture(fn+".mp4")
-    # vids = Video(fn+".mp4")
-    # 
-    print()
-    print()
-    print()
-    vid = Video(fn)
-
-    win = pygame.display.set_mode(vid.current_size, pygame.RESIZABLE)
-    font = pygame.font.Font(None, 25)
-    # font = pygame.font.SysFont("arial", 30)
-    # surfs = [font.render("Sharpen", True, "white")]
-
-
-
-    # cap = cv2.VideoCapture(fn+".mp4")
-    # width = int(vid.get(cv2.CAP_PROP_FRAME_WIDTH))
-    # height = int(vid.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    
-    # win = pygame.display.set_mode(vid.current_size)
-    pygame.display.set_caption(vid.name)
-    vid.set_volume(volume/100)
-
-
-
-
+    src.win.screen.vid = Video(fn)
+    src.win.screen.font = pygame.font.Font(None, 25)
+    src.win.screen.reset(src.win.screen.vid.current_size)
+    pygame.display.set_caption(src.win.screen.vid.name)
+    src.win.screen.vid.set_volume(src.win.setting.volume/100)
     msg_vl_info = 0
-    while vid.active:
-
-
+    while src.win.screen.vid.active:
         key = None
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                vid.stop()
+                src.win.screen.vid.stop()
             elif event.type == pygame.KEYDOWN:
                 key = pygame.key.name(event.key)
-
-        if key == "r":
-            vid.restart()           #rewind video to beginning
-        elif key == "p":
-            vid.toggle_pause()      #pause/plays video
-        elif key == "m":
-            vid.toggle_mute()       #mutes/unmutes video
-        elif key == "right":
-            vid.seek(15)            #skip 15 seconds in video
-        elif key == "left":
-            vid.seek(-15)           #rewind 15 seconds in video
-        elif key == "up":
-            msg_vl_info = time.time()
-            if volume < 100:
-                volume += 10
-                vid.set_volume(volume/100)
-        elif key == "down":
-            msg_vl_info = time.time()
-            if volume > 0:
-                volume -= 10
-                vid.set_volume(volume/100)
-        elif key == "tab":
-            vid.toggle_pause() 
-            text = input("Stop == [0], Search == [1], add == [2] : ")
-            if text == "0":
-                vid.stop()
-                vid.close()
-                download.clear(fns)
+        if src.win.screen.load == 2: # play
+            if key == "r":
+                src.win.screen.vid.restart()
+            elif key == "p":
+                src.win.screen.vid.toggle_pause()
+            elif key == "m":
+                src.win.screen.vid.toggle_mute()
+            elif key == "right":
+                src.win.screen.vid.seek(15)
+            elif key == "left":
+                src.win.screen.vid.seek(-15)
+            elif key == "up":
+                msg_vl_info = time.time()
+                if src.win.setting.volume < 100:
+                    src.win.setting.volume += 10
+                    src.win.screen.vid.set_volume(src.win.setting.volume/100)
+            elif key == "down":
+                msg_vl_info = time.time()
+                if src.win.setting.volume > 0:
+                    src.win.setting.volume -= 10
+                    src.win.screen.vid.set_volume(src.win.setting.volume/100)
+            if src.win.screen.vid.draw(src.win.screen.win, (0, 0), force_draw=True):
+                if time.time() - msg_vl_info <= 2:
+                    text_surface = src.win.screen.font.render(f"Set Volume > {src.win.setting.volume}%", True, (255,255,255))
+                    text_rect = text_surface.get_rect(center=(80,10)) 
+                    src.win.screen.win.blit(text_surface, text_rect)
                 pygame.display.update()
-                # pygame.display.flip()
-                pygame.init()
-                pygame.mixer.init()
-        # only draw new frames, and only update the screen if something is drawn
-        # pygame.display.flip()
-        if vid.draw(win, (0, 0), force_draw=True):#False
-            if time.time() - msg_vl_info <= 2:
-                text_surface = font.render(f"Set Volume > {volume}%", True, (255,255,255))
-                text_rect = text_surface.get_rect(center=(80,10)) 
-                win.blit(text_surface, text_rect)
-            # durat = float(vid.num_frames) / float(fps)
-            # duration = font.render(f"{vid.duration}", True, (255,255,255))
-            # text_rect = duration.get_rect(center=(80,50)) 
-            # win.blit(text_surface, text_rect)
-
-            # for i, surf in enumerate(surfs):
-            #     x = 320 * i
-            #     vid.draw(win, (x, 0))
-            #     pygame.draw.rect(win, "black", (x, 0, *surf.get_size()))
-            #     win.blit(surf, (x, 0))
-
-            pygame.display.update()
-
-        pygame.time.wait(16) # around 60 fps
-
-
-    # close video when done
-
-    vid.close()
+        pygame.time.wait(16)
+    src.win.screen.vid.close()
     download.clear(fns)
     pygame.display.update()
-    # pygame.display.flip()
-    pygame.init()
-    pygame.mixer.init()
+
+def wait():
+    global search
+    if src.win.screen.vid == None:
+        src.win.screen.reset((700,400))
+    else:
+        src.win.screen.reset(src.win.screen.vid.current_size)
+    pygame.scrap.init()
+    while True:
+        src.win.screen.win.fill((0, 0, 0))
+        key = None
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.display.quit()
+            elif event.type == pygame.KEYDOWN:
+                key = pygame.key.name(event.key)
+                if event.key == pygame.K_v and (pygame.key.get_mods() & pygame.KMOD_CTRL):
+                    if pygame.scrap.get_init():
+                        copied_text = pygame.scrap.get(pygame.SCRAP_TEXT)
+                        if copied_text:
+                            copied_text = copied_text.decode('utf-8').strip('\x00')
+                            search += copied_text
+                            continue
+        if not key:
+            text_surface = src.win.screen.font.render(f"search video : {search}", True, (255,255,255))
+            text_rect = text_surface.get_rect(center=(src.win.screen.win.get_size()[0]/2,src.win.screen.win.get_size()[1]/2)) 
+            src.win.screen.win.blit(text_surface, text_rect)
+            pygame.display.update()
+            continue
+        elif key == "backspace":
+            search = search[0:len(search)-1]
+        elif len(key) == 1:
+            search = search + key
+        text_surface = src.win.screen.font.render(f"search video : {search}", True, (255,255,255))
+        text_rect = text_surface.get_rect(center=(src.win.screen.win.get_size()[0]/2,src.win.screen.win.get_size()[1]/2)) 
+        src.win.screen.win.blit(text_surface, text_rect)
+        pygame.display.update()
+        if key == "enter" or key == "return":
+            a = search
+            search = ""
+            trys = 0
+            while True:
+                try:
+                    run(a)
+                    break
+                except Exception as e:
+                    if src.win.screen.vid == None:
+                        src.win.screen.reset((700,400))
+                    else:
+                        src.win.screen.reset(src.win.screen.vid.current_size)
+                    if trys >= 10:
+                        print("fail")
+                        break
+                    print(f"An error occurred during playback. Trying again... ({trys}/10) > \n{e}")
+                    text_surface = src.win.screen.font.render(f"An error occurred during playback. Trying again... ({trys}/10) >", True, (255,255,255))
+                    text_surface_2 = src.win.screen.font.render(f"{e}", True, (255,255,255))
+                    text_rect = text_surface.get_rect(center=(src.win.screen.win.get_size()[0]/2,src.win.screen.win.get_size()[1]/2)) 
+                    text_rect_2 = text_surface_2.get_rect(center=(src.win.screen.win.get_size()[0]/2,src.win.screen.win.get_size()[1]/2+30)) 
+                    src.win.screen.win.blit(text_surface, text_rect)
+                    src.win.screen.win.blit(text_surface_2, text_rect_2)
+                    pygame.display.update()
+                    time.sleep(0.5)
+                    trys += 1
