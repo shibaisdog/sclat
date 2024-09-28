@@ -1,5 +1,5 @@
 import os,pygame,shutil
-from pytubefix import YouTube
+from pytubefix import YouTube,Search
 from pytubefix.cli import on_progress
 ####################################
 import src.win.screen
@@ -16,7 +16,7 @@ def progress_function(stream, chunk, bytes_remaining):
     percentage = (bytes_downloaded / total_size) * 100
     on_progress(stream, chunk, bytes_remaining)
     src.win.screen.load = 1
-    src.win.screen.reset((stream.width,stream.height))
+    src.win.screen.reset((stream.width,stream.height+5))
     pygame.display.set_caption(f"Downloading: {convert_size(bytes_downloaded)} of {convert_size(total_size)} ({percentage:.2f}%)")
     text_surface = src.win.screen.font.render(f"Downloading: {convert_size(bytes_downloaded)} of {convert_size(total_size)} ({percentage:.2f}%)", True, (255,255,255))
     text_rect = text_surface.get_rect(center=(int(stream.width/2),int(stream.height/2)))
@@ -25,6 +25,19 @@ def progress_function(stream, chunk, bytes_remaining):
 
 def after(a,b):
     src.win.screen.load = 2
+
+def search(q:str,result:int):
+    list = Search(query=q)
+    return list.videos
+
+def search_infos(videos):
+    res = []
+    for video in videos:
+        res.append(video_info(f"https://www.youtube.com/watch?v={video.watch_url}"))
+    return res
+
+def video_info(url:str):
+    return YouTube(url).streaming_data
 
 def install(url:str):
     yt = YouTube(url, on_progress_callback = progress_function, on_complete_callback=after)

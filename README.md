@@ -2,7 +2,11 @@
 ### IMPORTANT! : The pytubefix version must be 7.1rc2 to download streaming videos.
 ---
 ### [ 비디오 재생방법 (gui 모드) ]
-  1. `search video :` 화면에서 원하는 영상의 링크를 적습니다 (컨트롤 + v 인식가능)
+  1. `search video :` 화면에서 원하는 영상의 링크를 적습니다 (컨트롤 + v 인식가능) | 또는 영상의 제목을 입력해요
+  2. 엔터를 입력하면 재생할수있어요
+  3. 이때 만약에 영상의 제목을 입력했으면 유튜브 영상의 리스트를 가져와요
+  4. 화살표 위 아래로 영상을 선택합니다
+  5. 엔터를 입력하면 재생할수있어요
 ---
 ### [ 비디오 재생중 조작키]
 - `r` : `재생중인 비디오를 처음부터 다시 실행합니다`
@@ -18,7 +22,11 @@
 ---
 
 ### [How to play video (GUI mode)]
- 1. `search video:` Enter the link of the video you want on the screen (Control + V can be recognized)
+  1. `search video:` screen, write down the link to the video you want (Control + V can be recognized) | Or enter the title of the video
+  2. You can play it by pressing enter.
+  3. At this time, if you entered the title of the video, get a list of YouTube videos.
+  4. Select the video using the up and down arrows
+  5. You can play it by pressing enter.
 ### [Operation keys during video playback]
 - `r` : `restart the video`
 - `p` : `pause the video`

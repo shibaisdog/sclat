@@ -6,4 +6,7 @@ def reset(size):
     pygame.init()
     pygame.mixer.init()
     win = pygame.display.set_mode(size, pygame.RESIZABLE)
-    font = pygame.font.Font(None, 25)
+    try:
+        font = pygame.font.Font("./asset/NanumBarunpenB.ttf", 20)
+    except FileNotFoundError:
+        font = pygame.font.Font(None, 20)
