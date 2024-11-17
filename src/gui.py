@@ -8,6 +8,7 @@ import src.down
 import src.down.download
 import src.win.screen
 import src.win.setting
+import src.size
 search = ""
 pattern = r"(?:v=|\/)([0-9A-Za-z_-]{11}).*"
 def is_url(url: str) -> bool:
@@ -55,6 +56,7 @@ def run(url:str):
     msg_value = ""
     global ascii_mode, cap, font_size, font
     font = pygame.font.SysFont("Courier", font_size)
+    cap = cv2.VideoCapture(fn)
     while src.win.screen.vid.active:
         key = None
         for event in pygame.event.get():
@@ -92,7 +94,7 @@ def run(url:str):
             elif key == "a":
                 ascii_mode = not ascii_mode
                 if ascii_mode:
-                    cap = cv2.VideoCapture(fn)
+                    #cap = cv2.VideoCapture(fn)
                     video_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
                     video_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
                     ascii_width = 80
@@ -106,12 +108,13 @@ def run(url:str):
                         cap.release()
                         cap = None
                     src.win.screen.reset((src.win.screen.vid.current_size[0], src.win.screen.vid.current_size[1]+5))
+            current_time = src.win.screen.vid.get_pos()
+            fps = cap.get(cv2.CAP_PROP_FPS)
+            frame_number = int(current_time * fps)
+            cap.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
+            ret, frame = cap.read()
+            frame = src.size.sizeup(frame,pygame.display.get_window_size())
             if ascii_mode and cap:
-                current_time = src.win.screen.vid.get_pos()
-                fps = cap.get(cv2.CAP_PROP_FPS)
-                frame_number = int(current_time * fps)
-                cap.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
-                ret, frame = cap.read()
                 if ret:
                     ascii_frame = frame_to_ascii(frame, width=ascii_width)
                     src.win.screen.win.fill((0, 0, 0))
@@ -142,26 +145,27 @@ def run(url:str):
                     pygame.display.update()
                     src.win.screen.vid.draw(src.win.screen.win, (0, 0))
             else:
-                if src.win.screen.vid.draw(src.win.screen.win, (0, 0), force_draw=True):
-                    if time.time() - msg_info <= 2:
-                        if msg_value == "volume":
-                            text_surface = src.win.screen.font.render(f"Set Volume > {src.win.setting.volume}%", True, (255,255,255))
-                        elif msg_value == "loop":
-                            text_surface = src.win.screen.font.render(f"Set Loop > {src.win.setting.loop}", True, (255,255,255))
-                        else:
-                            text_surface = src.win.screen.font.render("", True, (255,255,255))
-                        text_rect = text_surface.get_rect(center=(80,10)) 
-                        src.win.screen.win.blit(text_surface, text_rect)
-                    current_time = src.win.screen.vid.get_pos()
-                    total_length = src.win.screen.vid.duration
-                    rect_coords = (0, src.win.screen.win.get_size()[1] - 5, src.win.screen.win.get_size()[0], 5)
-                    pygame.draw.rect(src.win.screen.win, (100, 100, 100), rect_coords)
-                    linebar = (current_time / total_length) * src.win.screen.win.get_size()[0]
-                    rect_coords = (0, src.win.screen.win.get_size()[1] - 5, linebar, 5)
-                    pygame.draw.rect(src.win.screen.win, (255, 0, 0), rect_coords)
-                    pygame.display.update()
-                    caps = f"[{current_time:.2f}s / {total_length:.2f}s] {src.win.screen.vid.name}"
-                    pygame.display.set_caption(caps)
+                frame_surface = pygame.surfarray.make_surface(frame)
+                src.win.screen.win.blit(frame_surface, (0, 0))
+                if time.time() - msg_info <= 2:
+                    if msg_value == "volume":
+                        text_surface = src.win.screen.font.render(f"Set Volume > {src.win.setting.volume}%", True, (255, 255, 255))
+                    elif msg_value == "loop":
+                        text_surface = src.win.screen.font.render(f"Set Loop > {src.win.setting.loop}", True, (255, 255, 255))
+                    else:
+                        text_surface = src.win.screen.font.render("", True, (255, 255, 255))
+                    text_rect = text_surface.get_rect(center=(80, 10))
+                    src.win.screen.win.blit(text_surface, text_rect)
+                total_length = src.win.screen.vid.duration
+                rect_coords = (0, src.win.screen.win.get_size()[1] - 5, src.win.screen.win.get_size()[0], 5)
+                pygame.draw.rect(src.win.screen.win, (100, 100, 100), rect_coords)
+                linebar = (current_time / total_length) * src.win.screen.win.get_size()[0]
+                rect_coords = (0, src.win.screen.win.get_size()[1] - 5, linebar, 5)
+                pygame.draw.rect(src.win.screen.win, (255, 0, 0), rect_coords)
+                caps = f"[{current_time:.2f}s / {total_length:.2f}s] {src.win.screen.vid.name}"
+                pygame.display.set_caption(caps)
+                pygame.display.update()
+                src.win.screen.vid.draw(src.win.screen.win, (0, 0))
         pygame.time.wait(16)
     if cap:
         cap.release()
