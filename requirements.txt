@@ -1,5 +1,6 @@
 pygame == 2.5.2
 chardet == 5.2.0
 pytubefix == 7.1rc2
-pyvidplayer2 == 1.26.4
+pyvidplayer2 == 0.9.24
 opencv-python == 4.6.0.66
+ffmpeg == 1.4
