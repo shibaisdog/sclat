@@ -200,6 +200,9 @@ def run(url: str):
             frame_number = int(current_time * fps)
             state.cap.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
             ret, frame = state.cap.read()
+            if total_length - current_time <= 0.1:
+                if src.win.setting.loop:
+                    src.win.screen.vid.restart()
             if not ret:
                 break
             if state.ascii_mode and state.cap:
