@@ -1,8 +1,6 @@
 import ffmpeg
-import cv2
 import pygame
 from src.down import download
-import time
 
 def run(url:str):
     pygame.init()
