@@ -1,59 +1,101 @@
-### 중요! : pytubefix 버전이 7.1rc2 이여야지만 스트리밍 영상을 다운받을수있어요
+# Sclat
 
-### IMPORTANT! : The pytubefix version must be 7.1rc2 to download streaming videos.
+ASCII 아트 기능이 포함된 Python 기반 YouTube 비디오 플레이어입니다.
 
----
+<p align="center">
+    <img src="./asset/sclatLogo.png" width="248" alt="Sclat 로고">
+</p>
 
-### [ 비디오 재생방법 (gui 모드) ]
+## 🌐 언어 | Language
 
-1. `search video :` 화면에서 원하는 영상의 링크를 적습니다 (컨트롤 + v 인식가능) | 또는 영상의 제목을 입력해요
-2. 엔터를 입력하면 재생할수있어요
-3. 이때 만약에 영상의 제목을 입력했으면 유튜브 영상의 리스트를 가져와요
-4. 화살표 위 아래로 영상을 선택합니다
-5. 엔터를 입력하면 재생할수있어요
+[한국어](README.md) | [English](README.en.md)
 
----
+## ⚙️ 요구사항
 
-### [ 비디오 재생중 조작키]
+> **중요**: 스트리밍 비디오 호환성을 위해 pytubefix는 반드시 7.1rc2 버전이어야 합니다
 
--   `r` : `재생중인 비디오를 처음부터 다시 실행합니다`
--   `p` : `재생중인 비디오를 중지시킵니다 / 중지되었을때는 다시 재생시킵니다`
--   `m` : `음악을 뮤트시켜요`
--   `l` : `현재 재생중인 영상을 반복 재생합니다`
--   `a` : `아스키 아트 모드를 켭니다/끕니다`
+-   Python 3.8+
+-   pygame
+-   OpenCV (cv2)
+-   FFmpeg
+-   chardet==5.2.0
+-   pytubefix==7.1rc2
+-   pyvidplayer2==0.9.24
 
----
+## 🌟 주요 기능
 
-### 화살표
+-   YouTube 동영상 재생 및 다운로드 기능
+-   실시간 ASCII 아트 변환 모드
+-   직관적인 키보드 컨트롤
+-   동영상 검색 기능
+-   볼륨 및 재생 제어
+-   GUI 및 CLI 인터페이스
 
--   `위` : `음악의 볼륨을 늘려요`
--   `아래` : `음악의 볼륨을 줄여요`
--   `왼쪽` : `동영상을 15초 스킵시켜요`
--   `오른쪽` : `동영상을 15초 앞으로 건너뛰어요`
+## 🚀 실행 방법
 
----
+### 설치
 
-### [How to play video (GUI mode)]
+**Windows**
 
-1. `search video:` screen, write down the link to the video you want (Control + V can be recognized) | Or enter the title of the video
-2. You can play it by pressing enter.
-3. At this time, if you entered the title of the video, get a list of YouTube videos.
-4. Select the video using the up and down arrows
-5. You can play it by pressing enter.
+```batch
+install.bat
+```
 
-### [Operation keys during video playback]
+**터미널**
 
--   `r` : `restart the video`
--   `p` : `pause the video`
--   `m` : `mute the music`
--   `l` : `Loop the currently playing video`
--   `a` : `Toggle ASCII art mode on/off`
+```bash
+pip install -r requirements.txt
+```
 
----
+### 사용법
 
-### arrow keys
+**Windows**
 
--   `up` : `Increase the volume of music`
--   `down` : `Turn down the music volume`
--   `left` : `Skip back 15 seconds`
--   `right` : `Skip forward 15 seconds`
+```batch
+# GUI 모드
+start.bat
+```
+
+**터미널**
+
+```bash
+# GUI 모드
+python main.py
+
+# CLI 모드
+python main.py --nogui
+
+# 단일 재생
+python main.py --once
+
+# 재생목록 모드
+python main.py --play [URL1] [URL2]...
+```
+
+## 🎮 비디오 컨트롤
+
+### 재생 제어
+
+| 키  | 기능               |
+| --- | ------------------ |
+| `R` | 비디오 재시작      |
+| `P` | 재생/일시정지      |
+| `M` | 음소거/음소거 해제 |
+| `L` | 반복 재생 전환     |
+| `A` | ASCII 모드 전환    |
+
+### 탐색
+
+| 키  | 기능        |
+| --- | ----------- |
+| `↑` | 볼륨 증가   |
+| `↓` | 볼륨 감소   |
+| `←` | 15초 되감기 |
+| `→` | 15초 앞으로 |
+
+## 🔍 검색 인터페이스
+
+-   비디오 URL 또는 검색어 입력
+-   `Ctrl+V`로 URL 붙여넣기
+-   방향키로 결과 탐색
+-   Enter로 선택 재생
