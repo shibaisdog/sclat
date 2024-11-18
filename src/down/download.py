@@ -1,4 +1,4 @@
-import os,pygame,shutil
+import os,pygame,shutil,yt_dlp
 from pytubefix import YouTube,Search
 from pytubefix.cli import on_progress
 ####################################
@@ -33,6 +33,18 @@ def after(a,b):
 def search(q:str,result:int):
     list = Search(query=q)
     return list.videos
+
+def get_playlist_video(playlist_url):
+    ydl_opts = {
+        'extract_flat': True,
+        'force_generic_extractor': True,
+    }
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        result = ydl.extract_info(playlist_url, download=False)
+        if 'entries' in result:
+            return [entry['url'] for entry in result['entries']]
+        else:
+            return []
 
 def search_infos(videos):
     res = []

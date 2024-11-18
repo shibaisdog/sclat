@@ -30,6 +30,9 @@ state = VideoState()
 def is_url(url: str) -> bool:
     match = re.search(src.win.setting.SEARCH_PATTERN, url)
     return bool(match)
+def is_playlist(url: str) -> bool:
+    match = re.search(src.win.setting.PLAYLIST_SEARCH_PATTERN, url)
+    return bool(match)
 
 def frame_to_ascii(frame, width=100):
     """
@@ -83,7 +86,7 @@ def handle_key_event(key: str) -> None:
     """
     if not key:
         return
-        
+
     if key == "r":
         src.win.screen.vid.restart()
         state.msg_text = "Restarted"
@@ -99,7 +102,7 @@ def handle_key_event(key: str) -> None:
     elif key in ["up", "down"]:
         volume_delta = 10 if key == "up" else -10
         if 0 <= src.win.setting.volume + volume_delta <= 100:
-            src.win.setting.volume += volume_delta
+            src.win.setting.change_setting_data('volume',src.win.setting.volume + volume_delta)
             src.win.screen.vid.set_volume(src.win.setting.volume/100)
             state.msg_text = f"Volume: {src.win.setting.volume}%"
     elif key in ["right", "left"]:
@@ -290,6 +293,33 @@ def wait():
             src.win.screen.win.blit(text_surface, text_rect)
             pygame.display.update()
             if key == "enter" or key == "return":
+                #  TEST URL 'https://youtube.com/playlist?list=PLWe0uF1Zfq3K4ao8lvh2fM3NDqBAxhdaZ&si=JO4TZBYAokbwWzHe'
+                if is_playlist(state.search):
+                    video_urls = download.get_playlist_video(state.search)
+                    src.win.setting.video_list.extend(video_urls)
+                    trys = 0
+                    while len(src.win.setting.video_list) != 0:
+                        try:
+                            run(src.win.setting.video_list[0])
+                            src.win.setting.video_list.remove(src.win.setting.video_list[0])
+                        except Exception as e:
+                            if src.win.screen.vid == None:
+                                src.win.screen.reset((state.search_width, state.search_height))
+                            else:
+                                src.win.screen.reset((src.win.screen.vid.current_size[0],src.win.screen.vid.current_size[1]+5), vid=True)
+                            if trys >= 10:
+                                print("fail")
+                                break
+                            print(f"An error occurred during playback. Trying again... ({trys}/10) > \n{e}")
+                            text_surface = src.win.screen.font.render(f"An error occurred during playback. Trying again... ({trys}/10) >", True, (255,255,255))
+                            text_surface_2 = src.win.screen.font.render(f"{e}", True, (255,255,255))
+                            text_rect = text_surface.get_rect(center=(src.win.screen.win.get_size()[0]/2,src.win.screen.win.get_size()[1]/2)) 
+                            text_rect_2 = text_surface_2.get_rect(center=(src.win.screen.win.get_size()[0]/2,src.win.screen.win.get_size()[1]/2+30)) 
+                            src.win.screen.win.blit(text_surface, text_rect)
+                            src.win.screen.win.blit(text_surface_2, text_rect_2)
+                            pygame.display.flip()
+                            time.sleep(0.5)
+                            trys += 1
                 if is_url(state.search):
                     a = state.search
                     state.search = ""
