@@ -103,7 +103,7 @@ def handle_key_event(key: str) -> None:
     elif key in ["up", "down"]:
         volume_delta = 10 if key == "up" else -10
         if 0 <= user_setting.volume + volume_delta <= 100:
-            src.win.setting.change_setting_data('volume',user_setting.volume + volume_delta)
+            user_setting.change_setting_data('volume',user_setting.volume + volume_delta)
             src.win.screen.vid.set_volume(user_setting.volume/100)
             state.msg_text = f"Volume: {user_setting.volume}%"
     elif key in ["right", "left"]:
