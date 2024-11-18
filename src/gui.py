@@ -22,6 +22,9 @@ class VideoState:
     search: str = ""
     search_width: int = 0
     search_height: int = 0
+    fullscreen: bool = False
+    display_width: int = 0
+    display_height: int = 0
     ascii_width: int = 80 
     msg_start_time: float = 0
     msg_text: str = ""
@@ -110,6 +113,12 @@ def handle_key_event(key: str) -> None:
         seek_amount = 15 if key == "right" else -15
         src.win.screen.vid.seek(seek_amount)
         state.msg_text = f"Seek: {seek_amount:+d}s"
+    elif key == "f11":
+        state.fullscreen = not state.fullscreen
+        if not state.fullscreen:
+            src.win.screen.reset((src.win.screen.vid.current_size[0], src.win.screen.vid.current_size[1]+5))
+        else:
+            src.win.screen.reset((state.display_width,state.display_height))
     elif key == "a":
         toggle_ascii_mode()
         state.msg_text = "ASCII Mode" if state.ascii_mode else "Normal Mode"
@@ -245,7 +254,9 @@ def run(url: str):
 def wait():
     global state
     screen_info = pygame.display.Info()
-    state.search_width = screen_info.current_w // 2
+    state.display_width = screen_info.current_w
+    state.display_height = screen_info.current_h
+    state.search_width = state.display_width // 2
     state.search_height = int(state.search_width * (9 / 16))
     os.environ['SDL_VIDEO_CENTERED'] = '1'
     if src.win.screen.vid is None:

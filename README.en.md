@@ -93,6 +93,13 @@ start.sh --nogui --play [URL1] [URL2]...
 | `←` | Rewind 15s      |
 | `→` | Forward 15s     |
 
+### Function
+
+|  Key  | Function   |
+| ----- | ---------- |
+| `f11` | Fullscreen |
+
+
 ## 🔍 Search Interface
 
 -   Enter video URL or search term
