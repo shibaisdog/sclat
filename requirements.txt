@@ -3,4 +3,4 @@ chardet == 5.2.0
 pytubefix == 7.1rc2
 pyvidplayer2 == 0.9.24
 opencv-python == 4.6.0.66
-ffmpeg == 1.4
+moviepy == 1.0.3

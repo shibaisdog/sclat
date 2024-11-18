@@ -1,11 +1,15 @@
 import pygame
 load = 0 # 0 = choice / 1 = download / 2 = play
-win,font,vid = None,None,None
-def reset(size):
-    global win,font
+win, font, vid = None, None, None
+
+def reset(size, vid=None):
+    global win, font
     pygame.init()
     pygame.mixer.init()
-    win = pygame.display.set_mode(size, pygame.RESIZABLE)
+    if vid is None:
+        win = pygame.display.set_mode(size, pygame.RESIZABLE)
+    else:
+        win = pygame.display.set_mode(size)
     try:
         font = pygame.font.Font("./asset/NanumBarunpenB.ttf", 20)
     except FileNotFoundError:
