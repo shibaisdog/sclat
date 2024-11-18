@@ -1,7 +1,8 @@
 pygame == 2.5.2
+yt_dlp == 2024.8.6
+moviepy == 1.0.3
 chardet == 5.2.0
 pytubefix == 7.1rc2
 pyvidplayer2 == 0.9.24
-opencv-python == 4.6.0.66
-moviepy == 1.0.3
-yt_dlp == 2024.8.6
+opencv-python == 4.5.5.64
+numpy == 1.26.4

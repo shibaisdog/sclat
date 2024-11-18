@@ -1,1 +1,0 @@
-@START /b python ./main.py
