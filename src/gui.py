@@ -8,15 +8,6 @@ import src.win.screen
 import src.win.setting
 import src.size
 
-# Constants
-SEARCH_PATTERN = r"(?:v=|\/)([0-9A-Za-z_-]{11}).*"
-MESSAGE_DISPLAY_TIME = 2.0  
-ASCII_CHARS = ["$", "@", "B", "%", "8", "&", "W", "M", "#", "*", "o", "a", "h", "k", "b", "d", 
-               "p", "q", "w", "m", "Z", "O", "0", "Q", "L", "C", "J", "U", "Y", "X", "z", "c",
-               "v", "u", "n", "x", "r", "j", "f", "t", "/", "\\", "|", "(", ")", "1", "{", "}",
-               "[", "]", "?", "-", "_", "+", "~", "<", ">", "i", "!", "l", "I", ";", ":", ",",
-               "\"", "^", "`", "'", ".", " "]
-
 # Global state
 @dataclass
 class VideoState:
@@ -34,7 +25,7 @@ class VideoState:
 state = VideoState()
 
 def is_url(url: str) -> bool:
-    match = re.search(SEARCH_PATTERN, url)
+    match = re.search(src.win.setting.SEARCH_PATTERN, url)
     return bool(match)
 
 def frame_to_ascii(frame, width=100):
@@ -56,12 +47,12 @@ def frame_to_ascii(frame, width=100):
     resized_image = cv2.resize(frame, (width, new_height))
     ascii_chars = []
     colors = []
-    scale = 256 / len(ASCII_CHARS)
+    scale = 256 / len(src.win.setting.ASCII_CHARS)
     pixels = resized_image.reshape(-1, 3)
     for pixel in pixels:
         brightness = int(pixel.mean())
         index = int(brightness / scale)
-        ascii_chars.append(ASCII_CHARS[index])
+        ascii_chars.append(src.win.setting.ASCII_CHARS[index])
         colors.append(tuple(pixel.astype(int)))
     ascii_image = []
     for i in range(0, len(ascii_chars), width):
@@ -138,7 +129,7 @@ def toggle_ascii_mode():
 
 def draw_overlay(current_time: float):
     """Draws the overlay text on the video screen"""
-    if time.time() - state.msg_start_time <= MESSAGE_DISPLAY_TIME and state.msg_text:
+    if time.time() - state.msg_start_time <= src.win.setting.MESSAGE_DISPLAY_TIME and state.msg_text:
         text_surface = src.win.screen.font.render(state.msg_text, True, (255,255,255))
         text_rect = text_surface.get_rect(topleft=(10, 10))
         src.win.screen.win.blit(text_surface, text_rect)
@@ -217,9 +208,7 @@ def run(url: str):
                             src.win.screen.win.blit(text_surface, (x, i * state.font_size))
                             x += state.font_size * 0.6
                     draw_overlay(current_time)
-                    
-                    caps = f"[{current_time:.2f}s / {total_length:.2f}s] {src.win.screen.vid.name}"
-                    pygame.display.set_caption(caps)
+                    pygame.display.set_caption(f"[{current_time:.2f}s / {total_length:.2f}s] {src.win.screen.vid.name}")
                     pygame.display.update()
                     src.win.screen.vid.draw(src.win.screen.win, (0, 0))
             else:
@@ -227,7 +216,7 @@ def run(url: str):
                 frame_surface = pygame.surfarray.make_surface(frame)
                 src.win.screen.win.blit(frame_surface, (0, 0))
                 draw_overlay(current_time)
-                caps = f"[{current_time:.2f}s / {total_length:.2f}s] {src.win.screen.vid.name}"
+                pygame.display.set_caption(f"[{current_time:.2f}s / {total_length:.2f}s] {src.win.screen.vid.name}")
                 pygame.display.update()
                 src.win.screen.vid.draw(src.win.screen.win, (0, 0))
         pygame.time.wait(16)
