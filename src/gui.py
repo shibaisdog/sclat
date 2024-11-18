@@ -1,4 +1,6 @@
-import pygame, pygame.scrap, chardet, cv2, time, re, os
+import chardet, cv2, time, re, os
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
+import pygame, pygame.scrap
 from pyvidplayer2 import Video
 from dataclasses import dataclass
 from typing import Optional
@@ -7,6 +9,7 @@ from src.down import download
 import src.win.screen
 import src.win.setting
 import src.size
+
 
 # Global state
 @dataclass
@@ -241,6 +244,8 @@ def wait():
     else:
         src.win.screen.reset((src.win.screen.vid.current_size[0], src.win.screen.vid.current_size[1] + 5), vid=True)
     pygame.scrap.init()
+    icon = pygame.image.load("./asset/sclatIcon.png")
+    pygame.display.set_icon(icon)
     pygame.display.set_caption("Sclat Video Player")
     pygame.key.set_text_input_rect(pygame.Rect(0, 0, 0, 0))
     while True:
