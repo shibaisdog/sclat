@@ -1,3 +1,4 @@
 {
-    "volume": 10
+    "volume": 10,
+    "file-save-dir": "./src/storage"
 }

@@ -5,10 +5,11 @@ from pyvidplayer2 import Video
 from dataclasses import dataclass
 from typing import Optional
 ##############################################
-from src.down import download
+from src.utils import download
+from src.utils import user_setting
+from src import size
 import src.win.screen
 import src.win.setting
-import src.size
 
 
 # Global state
@@ -101,10 +102,10 @@ def handle_key_event(key: str) -> None:
         state.msg_text = f"Loop: {'On' if src.win.setting.loop else 'Off'}"
     elif key in ["up", "down"]:
         volume_delta = 10 if key == "up" else -10
-        if 0 <= src.win.setting.volume + volume_delta <= 100:
-            src.win.setting.change_setting_data('volume',src.win.setting.volume + volume_delta)
-            src.win.screen.vid.set_volume(src.win.setting.volume/100)
-            state.msg_text = f"Volume: {src.win.setting.volume}%"
+        if 0 <= user_setting.volume + volume_delta <= 100:
+            src.win.setting.change_setting_data('volume',user_setting.volume + volume_delta)
+            src.win.screen.vid.set_volume(user_setting.volume/100)
+            state.msg_text = f"Volume: {user_setting.volume}%"
     elif key in ["right", "left"]:
         seek_amount = 15 if key == "right" else -15
         src.win.screen.vid.seek(seek_amount)
@@ -177,7 +178,7 @@ def run(url: str):
     src.win.screen.vid = Video(fn)
     src.win.screen.reset((src.win.screen.vid.current_size[0], src.win.screen.vid.current_size[1] + 5), vid=True)
     pygame.display.set_caption(src.win.screen.vid.name)
-    src.win.screen.vid.set_volume(src.win.setting.volume / 100)
+    src.win.screen.vid.set_volume(user_setting.volume / 100)
     global state
     state.font = pygame.font.SysFont("Courier", state.font_size)
     state.cap = cv2.VideoCapture(fn)
@@ -221,7 +222,7 @@ def run(url: str):
                     pygame.display.update()
                     src.win.screen.vid.draw(src.win.screen.win, (0, 0))
             else:
-                frame = src.size.sizeup(frame, pygame.display.get_window_size())
+                frame = size.sizeup(frame, pygame.display.get_window_size())
                 frame_surface = pygame.surfarray.make_surface(frame)
                 src.win.screen.win.blit(frame_surface, (0, 0))
                 draw_overlay(current_time)
@@ -234,10 +235,12 @@ def run(url: str):
         state.cap = None
     src.win.screen.vid.close()
     os.environ['SDL_VIDEO_CENTERED'] = '1'
-    src.win.screen.reset((state.search_width, state.search_height))
-    pygame.display.set_caption("Sclat Video Player")
+    src.win.setting.video_list.remove(src.win.setting.video_list[0])
+    if len(src.win.setting.video_list) == 0:
+        src.win.screen.reset((state.search_width, state.search_height))
     download.clear(fns)
     pygame.display.update()
+    pygame.display.set_caption("Sclat Video Player")
 
 def wait():
     global state
@@ -296,59 +299,14 @@ def wait():
             src.win.screen.win.blit(text_surface, text_rect)
             pygame.display.update()
             if key == "enter" or key == "return":
-                #  TEST URL 'https://youtube.com/playlist?list=PLWe0uF1Zfq3K4ao8lvh2fM3NDqBAxhdaZ&si=JO4TZBYAokbwWzHe'
                 if is_playlist(state.search):
                     video_urls = download.get_playlist_video(state.search)
                     src.win.setting.video_list.extend(video_urls)
-                    trys = 0
-                    while len(src.win.setting.video_list) != 0:
-                        try:
-                            run(src.win.setting.video_list[0])
-                            src.win.setting.video_list.remove(src.win.setting.video_list[0])
-                        except Exception as e:
-                            if src.win.screen.vid == None:
-                                src.win.screen.reset((state.search_width, state.search_height))
-                            else:
-                                src.win.screen.reset((src.win.screen.vid.current_size[0],src.win.screen.vid.current_size[1]+5), vid=True)
-                            if trys >= 10:
-                                print("fail")
-                                break
-                            print(f"An error occurred during playback. Trying again... ({trys}/10) > \n{e}")
-                            text_surface = src.win.screen.font.render(f"An error occurred during playback. Trying again... ({trys}/10) >", True, (255,255,255))
-                            text_surface_2 = src.win.screen.font.render(f"{e}", True, (255,255,255))
-                            text_rect = text_surface.get_rect(center=(src.win.screen.win.get_size()[0]/2,src.win.screen.win.get_size()[1]/2)) 
-                            text_rect_2 = text_surface_2.get_rect(center=(src.win.screen.win.get_size()[0]/2,src.win.screen.win.get_size()[1]/2+30)) 
-                            src.win.screen.win.blit(text_surface, text_rect)
-                            src.win.screen.win.blit(text_surface_2, text_rect_2)
-                            pygame.display.flip()
-                            time.sleep(0.5)
-                            trys += 1
-                if is_url(state.search):
-                    a = state.search
                     state.search = ""
-                    trys = 0
-                    while True:
-                        try:
-                            run(a)
-                            break
-                        except Exception as e:
-                            if src.win.screen.vid == None:
-                                src.win.screen.reset((state.search_width, state.search_height))
-                            else:
-                                src.win.screen.reset((src.win.screen.vid.current_size[0],src.win.screen.vid.current_size[1]+5), vid=True)
-                            if trys >= 10:
-                                print("fail")
-                                break
-                            print(f"An error occurred during playback. Trying again... ({trys}/10) > \n{e}")
-                            text_surface = src.win.screen.font.render(f"An error occurred during playback. Trying again... ({trys}/10) >", True, (255,255,255))
-                            text_surface_2 = src.win.screen.font.render(f"{e}", True, (255,255,255))
-                            text_rect = text_surface.get_rect(center=(src.win.screen.win.get_size()[0]/2,src.win.screen.win.get_size()[1]/2)) 
-                            text_rect_2 = text_surface_2.get_rect(center=(src.win.screen.win.get_size()[0]/2,src.win.screen.win.get_size()[1]/2+30)) 
-                            src.win.screen.win.blit(text_surface, text_rect)
-                            src.win.screen.win.blit(text_surface_2, text_rect_2)
-                            pygame.display.flip()
-                            time.sleep(0.5)
-                            trys += 1
+                elif is_url(state.search):
+                    a = state.search
+                    src.win.setting.video_list.append(a)
+                    state.search = ""
                 else:
                     src.win.screen.win.fill((0,0,0))
                     text_surface = src.win.screen.font.render(f"Searching YouTube videos...", True, (255,255,255))
@@ -357,7 +315,7 @@ def wait():
                     pygame.display.flip()
                     load = False
                     choice = 0
-                    videos = src.down.download.search(state.search,10)[:5]
+                    videos = download.search(state.search,10)[:5]
                     src.win.screen.win.fill((0,0,0))
                     pygame.display.flip()
                     while True:
@@ -394,42 +352,12 @@ def wait():
                         load = True
                         pygame.display.flip()
                         if key == "enter" or key == "return":
-                            trys = 0
-                            while True:
-                                try:
-                                    run(f"https://www.youtube.com/watch?v={videos[choice].watch_url}")
-                                    state.search = ""
-                                    break
-                                except Exception as e:
-                                    if src.win.screen.vid == None:
-                                        src.win.screen.reset((state.search_width, state.search_height))
-                                    else:
-                                        src.win.screen.reset((src.win.screen.vid.current_size[0],src.win.screen.vid.current_size[1]+5), vid=True)
-                                    if trys >= 10:
-                                        print("fail")
-                                        break
-                                    print(f"An error occurred during playback. Trying again... ({trys}/10) > \n{e}")
-                                    text_surface = src.win.screen.font.render(f"An error occurred during playback. Trying again... ({trys}/10) >", True, (255,255,255))
-                                    text_surface_2 = src.win.screen.font.render(f"{e}", True, (255,255,255))
-                                    text_rect = text_surface.get_rect(center=(src.win.screen.win.get_size()[0]/2,src.win.screen.win.get_size()[1]/2)) 
-                                    text_rect_2 = text_surface_2.get_rect(center=(src.win.screen.win.get_size()[0]/2,src.win.screen.win.get_size()[1]/2+30)) 
-                                    src.win.screen.win.blit(text_surface, text_rect)
-                                    src.win.screen.win.blit(text_surface_2, text_rect_2)
-                                    pygame.display.flip()
-                                    time.sleep(0.5)
-                                    trys += 1
+                            src.win.setting.video_list.append(f"https://www.youtube.com/watch?v={videos[choice].watch_url}")
                             break
-        else:
-            if not src.win.setting.loop:
-                sc = src.win.setting.video_list[0]
-                src.win.setting.video_list.remove(sc)
-            else:
-                sc = src.win.setting.video_list[0]
             trys = 0
-            while True:
+            while len(src.win.setting.video_list) != 0:
                 try:
-                    run(sc)
-                    break
+                    run(src.win.setting.video_list[0])
                 except Exception as e:
                     if src.win.screen.vid == None:
                         src.win.screen.reset((state.search_width, state.search_height))
@@ -437,6 +365,7 @@ def wait():
                         src.win.screen.reset((src.win.screen.vid.current_size[0],src.win.screen.vid.current_size[1]+5), vid=True)
                     if trys >= 10:
                         print("fail")
+                        src.win.setting.video_list = []
                         break
                     print(f"An error occurred during playback. Trying again... ({trys}/10) > \n{e}")
                     text_surface = src.win.screen.font.render(f"An error occurred during playback. Trying again... ({trys}/10) >", True, (255,255,255))
@@ -445,6 +374,6 @@ def wait():
                     text_rect_2 = text_surface_2.get_rect(center=(src.win.screen.win.get_size()[0]/2,src.win.screen.win.get_size()[1]/2+30)) 
                     src.win.screen.win.blit(text_surface, text_rect)
                     src.win.screen.win.blit(text_surface_2, text_rect_2)
-                    pygame.display.update()
+                    pygame.display.flip()
                     time.sleep(0.5)
                     trys += 1

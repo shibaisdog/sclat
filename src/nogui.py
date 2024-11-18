@@ -1,6 +1,6 @@
 from moviepy.editor import AudioFileClip
 import pygame
-from src.down import download
+from src.utils import download
 import os
 
 def run(url:str):
