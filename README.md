@@ -17,7 +17,7 @@ ASCII 아트 기능이 포함된 Python 기반 YouTube 비디오 플레이어입
 -   Python 3.8+
 -   pygame
 -   OpenCV (cv2)
--   FFmpeg
+-   moviepy == 1.0.3
 -   chardet==5.2.0
 -   pytubefix==7.1rc2
 -   pyvidplayer2==0.9.24

@@ -20,4 +20,5 @@ venv/
 
 # Logs and databases
 *.log
+src/down/storage/
 *.sqlite3

@@ -17,7 +17,7 @@ Python-based YouTube video player with ASCII art functionality.
 -   Python 3.8+
 -   pygame
 -   OpenCV (cv2)
--   FFmpeg
+-   moviepy == 1.0.3
 -   chardet==5.2.0
 -   pytubefix==7.1rc2
 -   pyvidplayer2==0.9.24
@@ -69,7 +69,7 @@ python main.py --nogui
 python main.py --once
 
 # Playlist mode
-python main.py --play [URL1] [URL2]...
+python main.py --nogui --play [URL1] [URL2]...
 ```
 
 ## 🎮 Video Controls

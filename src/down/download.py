@@ -16,10 +16,14 @@ def progress_function(stream, chunk, bytes_remaining):
     percentage = (bytes_downloaded / total_size) * 100
     on_progress(stream, chunk, bytes_remaining)
     src.win.screen.load = 1
-    src.win.screen.reset((stream.width,stream.height+5))
+    
+    width = stream.width if stream.width else 800
+    height = stream.height if stream.height else 600
+    
+    src.win.screen.reset((width, height+5))
     pygame.display.set_caption(f"Downloading: {convert_size(bytes_downloaded)} of {convert_size(total_size)} ({percentage:.2f}%)")
     text_surface = src.win.screen.font.render(f"Downloading: {convert_size(bytes_downloaded)} of {convert_size(total_size)} ({percentage:.2f}%)", True, (255,255,255))
-    text_rect = text_surface.get_rect(center=(int(stream.width/2),int(stream.height/2)))
+    text_rect = text_surface.get_rect(center=(int(width/2), int(height/2)))
     src.win.screen.win.blit(text_surface, text_rect)
     pygame.display.update()
 
@@ -40,8 +44,10 @@ def video_info(url:str):
     return YouTube(url).streaming_data
 
 def install(url:str):
+    os.makedirs("./src/down/storage/", exist_ok=True)
     yt = YouTube(url, on_progress_callback = progress_function, on_complete_callback=after)
     fns = f"./src/down/storage/{yt.length}/"
+    os.makedirs(fns, exist_ok=True)
     if not os.path.exists(fns):
         os.makedirs(fns)
     fn = f"{fns}{yt.title}.mp4"
@@ -50,6 +56,7 @@ def install(url:str):
     return fns, fn
 
 def install_nogui(url:str):
+    os.makedirs("./src/down/storage/", exist_ok=True)
     yt = YouTube(url, on_progress_callback=progress_function)
     fn = f"./src/down/storage/{yt.title}"
     audio = yt.streams.filter(only_audio=True).first()
@@ -57,7 +64,7 @@ def install_nogui(url:str):
     return fn
 
 def clear(folder_path):
-    if os.path.exists(folder_path) and os.path.isdir(folder_path):
-        shutil.rmtree(folder_path)
-    else:
-        print(f"The folder {folder_path} does not exist or is not a directory.")
+    if os.path.exists(folder_path):
+        if os.path.isdir(folder_path):
+            shutil.rmtree(folder_path)
+    os.makedirs(folder_path, exist_ok=True)
