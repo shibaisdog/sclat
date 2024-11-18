@@ -18,9 +18,9 @@ Python-based YouTube video player with ASCII art functionality.
 -   pygame
 -   OpenCV (cv2)
 -   moviepy == 1.0.3
--   chardet==5.2.0
--   pytubefix==7.1rc2
--   pyvidplayer2==0.9.24
+-   chardet == 5.2.0
+-   pytubefix == 7.1rc2
+-   pyvidplayer2 == 0.9.24
 
 ## 🌟 Key Features
 
@@ -44,7 +44,7 @@ install.bat
 **Terminal**
 
 ```bash
-pip install -r requirements.txt
+install.sh
 ```
 
 ### Usage
@@ -60,16 +60,16 @@ start.bat
 
 ```bash
 # GUI mode
-python main.py
+start.sh
 
 # CLI mode
-python main.py --nogui
+start.sh --nogui
 
 # Single playback
-python main.py --once
+start.sh --once
 
 # Playlist mode
-python main.py --nogui --play [URL1] [URL2]...
+start.sh --nogui --play [URL1] [URL2]...
 ```
 
 ## 🎮 Video Controls

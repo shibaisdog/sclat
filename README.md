@@ -18,9 +18,9 @@ ASCII 아트 기능이 포함된 Python 기반 YouTube 비디오 플레이어입
 -   pygame
 -   OpenCV (cv2)
 -   moviepy == 1.0.3
--   chardet==5.2.0
--   pytubefix==7.1rc2
--   pyvidplayer2==0.9.24
+-   chardet == 5.2.0
+-   pytubefix == 7.1rc2
+-   pyvidplayer2 == 0.9.24
 
 ## 🌟 주요 기능
 
@@ -44,7 +44,7 @@ install.bat
 **터미널**
 
 ```bash
-pip install -r requirements.txt
+install.sh
 ```
 
 ### 사용법
@@ -60,16 +60,16 @@ start.bat
 
 ```bash
 # GUI 모드
-python main.py
+start.sh
 
 # CLI 모드
-python main.py --nogui
+start.sh --nogui
 
 # 단일 재생
-python main.py --once
+start.sh --once
 
 # 재생목록 모드
-python main.py --play [URL1] [URL2]...
+start.sh --play [URL1] [URL2]...
 ```
 
 ## 🎮 비디오 컨트롤
