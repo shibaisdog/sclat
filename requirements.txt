@@ -5,4 +5,5 @@ chardet == 5.2.0
 pytubefix == 7.1rc2
 pyvidplayer2 == 0.9.24
 opencv-python == 4.5.5.64
+pypresence == 4.3.0
 numpy == 1.26.4

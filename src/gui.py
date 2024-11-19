@@ -10,6 +10,7 @@ from src.utils import user_setting
 from src import size
 import src.win.screen
 import src.win.setting
+import src.discord.client
 
 
 # Global state
@@ -193,7 +194,7 @@ def run(url: str):
     state.cap = cv2.VideoCapture(fn)
     state.msg_start_time = 0 
     state.msg_text = "" 
-
+    src.discord.client.update(time.time(),src.win.screen.vid.name)
     while src.win.screen.vid.active:
         key = None
         for event in pygame.event.get():

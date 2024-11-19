@@ -1,6 +1,7 @@
 import sys,time
 from src import gui, nogui
 import src.win.screen
+import src.discord.client
 args = sys.argv[1:]
 
 nogui_op = False
@@ -19,6 +20,7 @@ for arg in args:
     if arg == "--play":
         playlist_op = True
 
+src.discord.client.RPC.connect()
 while True:
     src.win.screen.load = 0
     if len(playlist_url) == 0 and nogui_op:
@@ -44,3 +46,4 @@ while True:
         break
     if once_op:
         break
+src.discord.client.RPC.close()
