@@ -246,6 +246,8 @@ def run(url: str):
     src.win.screen.vid.close()
     os.environ['SDL_VIDEO_CENTERED'] = '1'
     src.win.setting.video_list.remove(src.win.setting.video_list[0])
+    if state.fullscreen:
+        src.win.screen.reset((state.display_width,state.display_height))
     if len(src.win.setting.video_list) == 0:
         src.win.screen.reset((state.search_width, state.search_height))
     download.clear(fns)
@@ -260,7 +262,9 @@ def wait():
     state.search_width = state.display_width // 2
     state.search_height = int(state.search_width * (9 / 16))
     os.environ['SDL_VIDEO_CENTERED'] = '1'
-    if src.win.screen.vid is None:
+    if state.fullscreen:
+        src.win.screen.reset((state.display_width,state.display_height))
+    elif src.win.screen.vid is None:
         src.win.screen.reset((state.search_width, state.search_height))
     else:
         src.win.screen.reset((src.win.screen.vid.current_size[0], src.win.screen.vid.current_size[1] + 5), vid=True)
