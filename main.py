@@ -21,6 +21,7 @@ for arg in args:
         playlist_op = True
 
 src.discord.client.RPC.connect()
+src.discord.client.update(time.time(),"waiting...")
 while True:
     src.win.screen.load = 0
     if len(playlist_url) == 0 and nogui_op:

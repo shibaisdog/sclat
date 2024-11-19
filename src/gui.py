@@ -269,6 +269,7 @@ def wait():
     pygame.display.set_icon(icon)
     pygame.display.set_caption("Sclat Video Player")
     pygame.key.set_text_input_rect(pygame.Rect(0, 0, 0, 0))
+    src.discord.client.update(time.time(),"waiting...")
     while True:
         src.win.screen.win.fill((0, 0, 0))
         key = None
