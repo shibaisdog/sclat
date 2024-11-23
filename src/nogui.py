@@ -1,12 +1,12 @@
 from moviepy.editor import AudioFileClip
 import pygame
-from src.utils import download
+from src.utils import download,user_setting
 import os
 
 def run(url:str):
     pygame.init()
     pygame.mixer.init()
-    download.clear("./src/down/storage/")
+    download.clear(user_setting.file_save_dir)
     fn = download.install_nogui(url)
     mp3_path = fn + ".mp3"
     wav_path = fn + ".wav"

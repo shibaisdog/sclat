@@ -91,8 +91,12 @@ def handle_key_event(key: str) -> None:
     """
     if not key:
         return
-
-    if key == "r":
+    if key == "s":
+        src.win.screen.vid.seek(src.win.screen.vid.duration - src.win.screen.vid.get_pos())
+    elif key == "escape":
+        src.win.setting.video_list = []
+        src.win.screen.vid.seek(src.win.screen.vid.duration - src.win.screen.vid.get_pos())
+    elif key == "r":
         src.win.screen.vid.restart()
         state.msg_text = "Restarted"
     elif key == "p":
@@ -282,9 +286,13 @@ def wait():
                 if event.type == pygame.QUIT:
                     pygame.display.quit()
                     pygame.quit()
-                    return  
+                    return 
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_BACKSPACE:
+                    if event.key == pygame.K_ESCAPE:
+                        src.discord.client.RPC.close()
+                        pygame.quit()
+                        exit(0)
+                    elif event.key == pygame.K_BACKSPACE:
                         state.search = state.search[:-1]
                     elif event.key == pygame.K_RETURN:
                         key = "return"
@@ -354,6 +362,9 @@ def wait():
                                 choice += 1
                             else:
                                 choice = 0
+                        elif key == "escape":
+                            src.win.setting.video_list = []
+                            break
                         src.win.screen.win.fill((0,0,0))
                         for i, video in enumerate(videos):
                             if i == choice:

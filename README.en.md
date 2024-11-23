@@ -78,6 +78,7 @@ start.sh --nogui --play [URL1] [URL2]...
 
 | Key | Function          |
 | --- | ----------------- |
+| `S` | Seek video        |
 | `R` | Restart video     |
 | `P` | Play/Pause        |
 | `M` | Mute/Unmute       |
@@ -95,9 +96,10 @@ start.sh --nogui --play [URL1] [URL2]...
 
 ### Function
 
-|  Key  | Function   |
-| ----- | ---------- |
-| `f11` | Fullscreen |
+|  Key  | Function                |
+| ----- | ----------------------- |
+| `esc` | Return to search screen |
+| `f11` | Fullscreen              |
 
 
 ## 🔍 Search Interface
