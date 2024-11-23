@@ -258,7 +258,7 @@ def run(url: str):
     pygame.display.update()
     pygame.display.set_caption("Sclat Video Player")
 
-def wait():
+def wait(once):
     global state
     screen_info = pygame.display.Info()
     state.display_width = screen_info.current_w
@@ -386,6 +386,8 @@ def wait():
             while len(src.win.setting.video_list) != 0:
                 try:
                     run(src.win.setting.video_list[0])
+                    if once:
+                        break
                 except Exception as e:
                     if src.win.screen.vid == None:
                         src.win.screen.reset((state.search_width, state.search_height))

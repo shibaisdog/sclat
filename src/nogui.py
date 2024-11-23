@@ -1,8 +1,9 @@
 from moviepy.editor import AudioFileClip
-import pygame,os,re
+import pygame,time,os,re
 ############################################
 from src.utils import download,user_setting
 import src.win.setting
+import src.discord.client
 
 def is_url(url: str) -> bool:
     match = re.search(src.win.setting.SEARCH_PATTERN, url)
@@ -18,6 +19,7 @@ def run(url:str):
     fn = download.install_nogui(url)
     mp3_path = fn + ".mp3"
     wav_path = fn + ".wav"
+    src.discord.client.update(time.time(), fn.replace(user_setting.file_save_dir,''))
     if not os.path.exists(mp3_path):
         print(f"Error: MP3 file not found at {mp3_path}")
         return  
@@ -38,15 +40,16 @@ def run(url:str):
     except Exception as e:
         print(f"Error processing audio: {str(e)}")
     finally:
-        pygame.quit()
+        src.win.setting.video_list.remove(src.win.setting.video_list[0])
     
-def wait():
+def wait(once):
     while True:
         if len(src.win.setting.video_list) == 0:
+            src.discord.client.update(time.time(),"waiting...")
+            print("")
             search = input("Please enter the 'Video Title or URL or Playlist URL' to play the video : ")
         else:
             search = src.win.setting.video_list[0]
-            src.win.setting.video_list.remove(search)
         if is_playlist(search):
             video_urls = download.get_playlist_video(search)
             src.win.setting.video_list.extend(video_urls)
@@ -64,8 +67,20 @@ def wait():
                     if len(videos) < int_value or int_value <= 0:
                         print(f"You can only input from `1` to {len(videos)}")
                         return
-                    src.win.setting.video_list.append(f"https://www.youtube.com/watch?v={videos[int_value].watch_url}")
+                    src.win.setting.video_list.append(f"https://www.youtube.com/watch?v={videos[int_value-1].watch_url}")
                     break
                 except ValueError:
                     print("The value entered is not an integer")
-        run(src.win.setting.video_list[0])
+        trys = 0
+        while len(src.win.setting.video_list) != 0:
+            try:
+                run(src.win.setting.video_list[0])
+                if once:
+                    break
+            except Exception as e:
+                if trys >= 10:
+                    print("fail")
+                    break
+                print(f"An error occurred during playback. Trying again... ({trys}/10) > \n{e}")
+                time.sleep(0.5)
+                trys += 1
