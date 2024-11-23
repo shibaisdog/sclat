@@ -70,7 +70,7 @@ def install(url:str):
 
 def install_nogui(url:str):
     os.makedirs(user_setting.file_save_dir, exist_ok=True)
-    yt = YouTube(url, on_progress_callback=progress_function)
+    yt = YouTube(url, on_progress_callback=on_progress)
     fn = f"{user_setting.file_save_dir}/{yt.title}"
     audio = yt.streams.filter(only_audio=True).first()
     audio.download(filename=fn+".mp3")

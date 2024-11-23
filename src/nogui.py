@@ -1,7 +1,15 @@
 from moviepy.editor import AudioFileClip
-import pygame
+import pygame,os,re
+############################################
 from src.utils import download,user_setting
-import os
+import src.win.setting
+
+def is_url(url: str) -> bool:
+    match = re.search(src.win.setting.SEARCH_PATTERN, url)
+    return bool(match)
+def is_playlist(url: str) -> bool:
+    match = re.search(src.win.setting.PLAYLIST_SEARCH_PATTERN, url)
+    return bool(match)
 
 def run(url:str):
     pygame.init()
@@ -31,3 +39,33 @@ def run(url:str):
         print(f"Error processing audio: {str(e)}")
     finally:
         pygame.quit()
+    
+def wait():
+    while True:
+        if len(src.win.setting.video_list) == 0:
+            search = input("Please enter the 'Video Title or URL or Playlist URL' to play the video : ")
+        else:
+            search = src.win.setting.video_list[0]
+            src.win.setting.video_list.remove(search)
+        if is_playlist(search):
+            video_urls = download.get_playlist_video(search)
+            src.win.setting.video_list.extend(video_urls)
+        elif is_url(search):
+            src.win.setting.video_list.append(search)
+        else:
+            print("Searching YouTube videos...")
+            videos = download.search(search,10)[:5]
+            for i, video in enumerate(videos):
+                print(f"Choice: {i+1} / Title: {video.title}")
+            while True:
+                choice = input("Choose a videos (1 to {len(videos)}) : ")
+                try:
+                    int_value = int(choice)
+                    if len(videos) < int_value or int_value <= 0:
+                        print(f"You can only input from `1` to {len(videos)}")
+                        return
+                    src.win.setting.video_list.append(f"https://www.youtube.com/watch?v={videos[int_value].watch_url}")
+                    break
+                except ValueError:
+                    print("The value entered is not an integer")
+        run(src.win.setting.video_list[0])

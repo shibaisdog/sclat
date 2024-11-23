@@ -7,7 +7,6 @@ args = sys.argv[1:]
 nogui_op = False
 once_op = False
 playlist_op = False
-playlist_url = []
 for arg in args:
     if not arg.startswith("--") and playlist_op:
         playlist_url.append(arg)
@@ -24,16 +23,11 @@ src.discord.client.RPC.connect()
 src.discord.client.update(time.time(),"waiting...")
 while True:
     src.win.screen.load = 0
-    if len(playlist_url) == 0 and nogui_op:
-        url = input("Please enter the URL to play the video (youtube url) : ")
-    elif nogui_op:
-        url = playlist_url[0]
-        playlist_url.remove(url)
     if nogui_op:
         trys = 0
         while True:
             try:
-                nogui.run(url)
+                nogui.wait()
                 break
             except Exception as e:
                 if trys >= 10:
