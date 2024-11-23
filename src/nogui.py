@@ -58,7 +58,7 @@ def wait():
             for i, video in enumerate(videos):
                 print(f"Choice: {i+1} / Title: {video.title}")
             while True:
-                choice = input("Choose a videos (1 to {len(videos)}) : ")
+                choice = input(f"Choose a videos (1 to {len(videos)}) : ")
                 try:
                     int_value = int(choice)
                     if len(videos) < int_value or int_value <= 0:
