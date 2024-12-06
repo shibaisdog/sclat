@@ -1,4 +1,5 @@
 {
-    "volume": 10,
+    "discord_RPC": true,
+    "volume": 100,
     "file-save-dir": "./src/storage"
 }

@@ -6,7 +6,7 @@ Python-based YouTube video player with ASCII art functionality.
     <img src="./asset/sclatLogo.png" width="248" alt="Sclat Logo">
 </p>
 
-## 🌐 Language | 언어
+## 🌐 언어 | Language
 
 [한국어](README.md) | [English](README.en.md)
 
@@ -17,10 +17,14 @@ Python-based YouTube video player with ASCII art functionality.
 -   Python 3.8+
 -   pygame
 -   OpenCV (cv2)
+-   numpy
 -   moviepy == 1.0.3
 -   chardet == 5.2.0
 -   pytubefix == 7.1rc2
 -   pyvidplayer2 == 0.9.24
+-   yt_dlp == 2024.8.6
+
+See requirements.txt for more information.
 
 ## 🌟 Key Features
 
@@ -30,6 +34,7 @@ Python-based YouTube video player with ASCII art functionality.
 -   Video search functionality
 -   Volume and playback control
 -   GUI and CLI interfaces
+-   Discord RPC functionality
 
 ## 🚀 How to Run
 
@@ -96,11 +101,10 @@ start.sh --nogui --play [URL1] [URL2]...
 
 ### Function
 
-|  Key  | Function                |
+| Key   | Function                |
 | ----- | ----------------------- |
 | `esc` | Return to search screen |
 | `f11` | Fullscreen              |
-
 
 ## 🔍 Search Interface
 
@@ -108,3 +112,33 @@ start.sh --nogui --play [URL1] [URL2]...
 -   Paste URL with `Ctrl+V`
 -   Navigate results with arrow keys
 -   Select and play with Enter
+
+## ✨ Discord RPC
+
+Sclat supports the Discord Rich Presence feature, which automatically displays the currently playing video information in your Discord status.
+
+<p align="center">
+    <img src="./asset/discordRPC.png" width="300" alt="Discord RPC image">
+</p>
+
+### How to enable Discord RPC
+
+To use the Discord RPC feature, simply run the Discord program on your computer. If Discord is running, Sclat will automatically display the currently playing video information in the Discord status.
+
+### How to Disable Discord RPC
+
+To disable the Discord RPC feature, change the `discord_RPC` value to `false` in the `setting.json` file. The default value is `true`.
+
+**Steps to configure:**
+
+1. Open the `setting.json` file in the Sclat installation folder.
+2. Change `"discord_RPC": true` to `"discord_RPC": false`:
+
+    ```json
+    {
+        "discord_RPC": false
+        // other settings...
+    }
+    ```
+
+3. Save the file and restart the program.

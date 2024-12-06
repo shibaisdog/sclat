@@ -1,4 +1,5 @@
 from pypresence import Presence
+
 RPC = Presence(1308354144490360943)
 def update(start_time,name):
     RPC.update(
