@@ -6,5 +6,5 @@ def update(start_time,name):
         details=f"{name}",
         start=start_time,
         large_image="sclatlogo",
-        large_text="https://github.com/shibaisdog/sclat",
+        large_text="https://github.com/fluffy-melli/sclat",
     )
