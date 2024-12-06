@@ -19,7 +19,8 @@ def run(url:str):
     fn = download.install_nogui(url)
     mp3_path = fn + ".mp3"
     wav_path = fn + ".wav"
-    src.discord.client.update(time.time(), fn.replace(user_setting.file_save_dir,''))
+    if user_setting.discord_RPC:
+        src.discord.client.update(time.time(), fn.replace(user_setting.file_save_dir,''))
     if not os.path.exists(mp3_path):
         print(f"Error: MP3 file not found at {mp3_path}")
         return  
@@ -45,7 +46,8 @@ def run(url:str):
 def wait(once):
     while True:
         if len(src.win.setting.video_list) == 0:
-            src.discord.client.update(time.time(),"waiting...")
+            if user_setting.discord_RPC:
+                src.discord.client.update(time.time(),"waiting...")
             print("")
             search = input("Please enter the 'Video Title or URL or Playlist URL' to play the video : ")
         else:

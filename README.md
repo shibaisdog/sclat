@@ -17,10 +17,14 @@ ASCII 아트 기능이 포함된 Python 기반 YouTube 비디오 플레이어입
 -   Python 3.8+
 -   pygame
 -   OpenCV (cv2)
+-   numpy
 -   moviepy == 1.0.3
 -   chardet == 5.2.0
 -   pytubefix == 7.1rc2
 -   pyvidplayer2 == 0.9.24
+-   yt_dlp == 2024.8.6
+
+자세한 정보는 requirements.txt를 참고하세요.
 
 ## 🌟 주요 기능
 
@@ -30,6 +34,7 @@ ASCII 아트 기능이 포함된 Python 기반 YouTube 비디오 플레이어입
 -   동영상 검색 기능
 -   볼륨 및 재생 제어
 -   GUI 및 CLI 인터페이스
+-   Discord RPC 기능
 
 ## 🚀 실행 방법
 
@@ -78,7 +83,7 @@ start.sh --play [URL1] [URL2]...
 
 | 키  | 기능               |
 | --- | ------------------ |
-| `S` | 비디오 스킵         |
+| `S` | 비디오 스킵        |
 | `R` | 비디오 재시작      |
 | `P` | 재생/일시정지      |
 | `M` | 음소거/음소거 해제 |
@@ -96,10 +101,10 @@ start.sh --play [URL1] [URL2]...
 
 ### 기능
 
-|   키  | 기능                |
-| ----- | ------------------- |
+| 키    | 기능                  |
+| ----- | --------------------- |
 | `esc` | 검색화면으로 돌아가기 |
-| `f11` | 전체화면             |
+| `f11` | 전체화면              |
 
 ## 🔍 검색 인터페이스
 
@@ -107,3 +112,33 @@ start.sh --play [URL1] [URL2]...
 -   `Ctrl+V`로 URL 붙여넣기
 -   방향키로 결과 탐색
 -   Enter로 선택 재생
+
+## ✨ Discord RPC
+
+Sclat은 Discord Rich Presence 기능을 지원하여 현재 재생 중인 비디오 정보를 자동으로 Discord 상태에 표시합니다.
+
+<p align="center">
+    <img src="./asset/discordRPC.png" width="300" alt="Discord RPC 이미지">
+</p>
+
+### Discord RPC 키는 방법
+
+Discord RPC 기능을 사용하려면 컴퓨터에서 Discord 프로그램을 실행하면 됩니다. Sclat은 Discord가 실행 중인 경우 자동으로 현재 재생 중인 비디오 정보를 Discord 상태에 표시합니다.
+
+### Discord RPC 끄는 방법
+
+Discord RPC 기능을 비활성화하려면 `setting.json` 파일에서 `discord_RPC` 값을 `false`로 변경하십시오. 기본값은 `true`입니다.
+
+**설정 방법:**
+
+1. Sclat 설치 폴더에서 `setting.json` 파일을 엽니다.
+2. `"discord_RPC": true`를 `"discord_RPC": false`로 변경합니다:
+
+    ```json
+    {
+        "discord_RPC": false
+        // 다른 설정 값들...
+    }
+    ```
+
+3. 파일을 저장하고 프로그램을 다시 실행합니다.

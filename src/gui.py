@@ -12,7 +12,6 @@ import src.win.screen
 import src.win.setting
 import src.discord.client
 
-
 # Global state
 @dataclass
 class VideoState:
@@ -198,7 +197,8 @@ def run(url: str):
     state.cap = cv2.VideoCapture(fn)
     state.msg_start_time = 0 
     state.msg_text = "" 
-    src.discord.client.update(time.time(),src.win.screen.vid.name)
+    if user_setting.discord_RPC:
+        src.discord.client.update(time.time(),src.win.screen.vid.name)
     while src.win.screen.vid.active:
         key = None
         for event in pygame.event.get():
@@ -277,7 +277,8 @@ def wait(once):
     pygame.display.set_icon(icon)
     pygame.display.set_caption("Sclat Video Player")
     pygame.key.set_text_input_rect(pygame.Rect(0, 0, 0, 0))
-    src.discord.client.update(time.time(),"waiting...")
+    if user_setting.discord_RPC:
+        src.discord.client.update(time.time(),"waiting...")
     while True:
         src.win.screen.win.fill((0, 0, 0))
         key = None
@@ -289,7 +290,8 @@ def wait(once):
                     return 
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        src.discord.client.RPC.close()
+                        if user_setting.discord_RPC:
+                            src.discord.client.RPC.close()
                         pygame.quit()
                         exit(0)
                     elif event.key == pygame.K_BACKSPACE:
