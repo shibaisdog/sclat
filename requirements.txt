@@ -1,5 +1,5 @@
 pygame == 2.5.2
-yt_dlp == 2024.8.6
+yt_dlp == 2024.12.13
 moviepy == 1.0.3
 chardet == 5.2.0
 pytubefix == 7.1rc2
