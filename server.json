@@ -1,3 +1,4 @@
 {
-    "max-client": 5
+    "max-client": 5,
+    "last-server": ""
 }

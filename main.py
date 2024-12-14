@@ -27,7 +27,7 @@ for arg in args:
     if arg == "--with-play-server":
         src.with_play.Start_Server()
     if arg == "--with-play-client":
-        src.with_play.Start_Client('192.168.0.101')
+        src.with_play.client = True
 
 try:
     if user_setting.discord_RPC:

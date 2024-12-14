@@ -1,9 +1,11 @@
 import src.socket.server
 import src.socket.client
-import threading
+import threading, time
 
 client = False
 server = False
+c_server_ip = ''
+c_server_on = False
 
 def Start_Server():
     global server

@@ -2,6 +2,8 @@ import chardet, cv2, time, re, os
 
 import src.socket
 import src.socket.client
+import src.socket.setting
+import src.socket.user
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 import pygame, pygame.scrap
 from pyvidplayer2 import Video
@@ -190,13 +192,14 @@ def try_play_video(url: str, max_retries: int = 10) -> None:
             print(f"Retry {retry + 1}/{max_retries}: {str(e)}")
             time.sleep(0.5)
 
-def run(url: str):
+def run(url: str, seek = 0):
     os.environ['SDL_VIDEO_CENTERED'] = '1'
     fns, fn = download.install(url)
     src.win.screen.vid = Video(fn)
     src.win.screen.reset((src.win.screen.vid.current_size[0], src.win.screen.vid.current_size[1] + 5), vid=True)
     pygame.display.set_caption(src.win.screen.vid.name)
     src.win.screen.vid.set_volume(user_setting.volume / 100)
+    src.win.screen.vid.seek(seek)
     global state
     state.font = pygame.font.SysFont("Courier", state.font_size)
     state.cap = cv2.VideoCapture(fn)
@@ -207,7 +210,7 @@ def run(url: str):
     if src.with_play.server:
         src.socket.server.seek = 0
         src.socket.server.playurl = url
-        src.socket.server.broadcast_message({"type":"play-info","playurl": url,"seek": 0})
+        #src.socket.server.broadcast_message({"type":"play-info","playurl": url,"seek": 0})
     while src.win.screen.vid.active:
         key = None
         for event in pygame.event.get():
@@ -241,6 +244,8 @@ def run(url: str):
                             src.win.screen.win.blit(text_surface, (x, i * state.font_size))
                             x += state.font_size * 0.6
                     draw_overlay(current_time)
+                    if src.with_play.server:
+                        src.socket.server.seek = current_time
                     pygame.display.set_caption(f"[{current_time:.2f}s / {total_length:.2f}s] {src.win.screen.vid.name}")
                     pygame.display.update()
                     src.win.screen.vid.draw(src.win.screen.win, (0, 0))
@@ -249,6 +254,8 @@ def run(url: str):
                 frame_surface = pygame.surfarray.make_surface(frame)
                 src.win.screen.win.blit(frame_surface, (0, 0))
                 draw_overlay(current_time)
+                if src.with_play.server:
+                    src.socket.server.seek = current_time
                 pygame.display.set_caption(f"[{current_time:.2f}s / {total_length:.2f}s] {src.win.screen.vid.name}")
                 pygame.display.update()
                 src.win.screen.vid.draw(src.win.screen.win, (0, 0))
@@ -291,22 +298,60 @@ def wait(once):
     if src.with_play.server:
         src.socket.server.seek = 0
         src.socket.server.playurl = ''
-        src.socket.server.broadcast_message({"type":"play-wait"})
+        #src.socket.server.broadcast_message({"type":"play-wait"})
     last_playinfo_time = time.time()
+    if src.socket.setting.last_server != "":
+        src.with_play.c_server_ip = src.socket.setting.last_server
     while True:
         src.win.screen.win.fill((0, 0, 0))
         if src.with_play.client:
             if src.socket.client.play:
                 pygame.display.update()
-                run(src.socket.client.url)
-            current_time = time.time()
-            if current_time - last_playinfo_time >= 1:
-                src.socket.client.playinfo()
-                last_playinfo_time = current_time
-            text_surface = src.win.screen.font.render("Waiting for the server to play the song", True, (255,255,255))
-            text_rect = text_surface.get_rect(center=(src.win.screen.win.get_size()[0]/2,src.win.screen.win.get_size()[1]/2)) 
-            src.win.screen.win.blit(text_surface, text_rect)
-            pygame.display.update()
+                run(src.socket.client.url, src.socket.client.seek)
+            else:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.display.quit()
+                        pygame.quit()
+                        return 
+                    elif event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_ESCAPE:
+                            if user_setting.discord_RPC:
+                                src.discord.client.RPC.close()
+                            pygame.quit()
+                            exit(0)
+                        elif event.key == pygame.K_BACKSPACE:
+                            src.with_play.c_server_ip = src.with_play.c_server_ip[:-1]
+                        elif event.key == pygame.K_RETURN:
+                            src.socket.setting.change_setting_data("last-server", src.with_play.c_server_ip)
+                            src.with_play.Start_Client(src.with_play.c_server_ip)
+                        elif event.key == pygame.K_v and (pygame.key.get_mods() & pygame.KMOD_CTRL):
+                            if pygame.scrap.get_init():
+                                copied_text = pygame.scrap.get(pygame.SCRAP_TEXT)
+                                if copied_text:
+                                    try:
+                                        copied_text = copied_text.decode('utf-8').strip('\x00')
+                                    except UnicodeDecodeError:
+                                        detected = chardet.detect(copied_text)
+                                        encoding = detected['encoding']
+                                        copied_text = copied_text.decode(encoding).strip('\x00')
+                                    src.with_play.c_server_ip += copied_text
+                    elif event.type == pygame.TEXTINPUT:
+                        src.with_play.c_server_ip += event.text
+                if src.with_play.c_server_on:
+                    current_time = time.time()
+                    if current_time - last_playinfo_time >= 1:
+                        src.socket.client.playinfo()
+                        last_playinfo_time = current_time
+                    text_surface = src.win.screen.font.render("Waiting for the server to play the song", True, (255,255,255))
+                    text_rect = text_surface.get_rect(center=(src.win.screen.win.get_size()[0]/2,src.win.screen.win.get_size()[1]/2)) 
+                    src.win.screen.win.blit(text_surface, text_rect)
+                    pygame.display.update()
+                else:
+                    text_surface = src.win.screen.font.render(f"Server IP: {src.with_play.c_server_ip}", True, (255,255,255))
+                    text_rect = text_surface.get_rect(center=(src.win.screen.win.get_size()[0]/2,src.win.screen.win.get_size()[1]/2)) 
+                    src.win.screen.win.blit(text_surface, text_rect)
+                    pygame.display.update()
         else:
             key = None
             if len(src.win.setting.video_list) == 0:
@@ -338,6 +383,9 @@ def wait(once):
                                     state.search += copied_text
                     elif event.type == pygame.TEXTINPUT:
                         state.search += event.text
+                if src.with_play.server:
+                    src.socket.server.seek = 0
+                    src.socket.server.playurl = ''
                 if not key:
                     text_surface = src.win.screen.font.render(f"search video : {state.search}", True, (255,255,255))
                     text_rect = text_surface.get_rect(center=(src.win.screen.win.get_size()[0]/2,src.win.screen.win.get_size()[1]/2)) 
