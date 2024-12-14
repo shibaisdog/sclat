@@ -1,4 +1,7 @@
 import chardet, cv2, time, re, os
+
+import src.socket
+import src.socket.client
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 import pygame, pygame.scrap
 from pyvidplayer2 import Video
@@ -11,6 +14,8 @@ from src import size
 import src.win.screen
 import src.win.setting
 import src.discord.client
+import src.with_play
+import src.socket.server
 
 # Global state
 @dataclass
@@ -199,6 +204,10 @@ def run(url: str):
     state.msg_text = "" 
     if user_setting.discord_RPC:
         src.discord.client.update(time.time(),src.win.screen.vid.name)
+    if src.with_play.server:
+        src.socket.server.seek = 0
+        src.socket.server.playurl = url
+        src.socket.server.broadcast_message({"type":"play-info","playurl": url,"seek": 0})
     while src.win.screen.vid.active:
         key = None
         for event in pygame.event.get():
@@ -279,133 +288,151 @@ def wait(once):
     pygame.key.set_text_input_rect(pygame.Rect(0, 0, 0, 0))
     if user_setting.discord_RPC:
         src.discord.client.update(time.time(),"waiting...")
+    if src.with_play.server:
+        src.socket.server.seek = 0
+        src.socket.server.playurl = ''
+        src.socket.server.broadcast_message({"type":"play-wait"})
+    last_playinfo_time = time.time()
     while True:
         src.win.screen.win.fill((0, 0, 0))
-        key = None
-        if len(src.win.setting.video_list) == 0:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.display.quit()
-                    pygame.quit()
-                    return 
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        if user_setting.discord_RPC:
-                            src.discord.client.RPC.close()
+        if src.with_play.client:
+            if src.socket.client.play:
+                pygame.display.update()
+                run(src.socket.client.url)
+            current_time = time.time()
+            if current_time - last_playinfo_time >= 1:
+                src.socket.client.playinfo()
+                last_playinfo_time = current_time
+            text_surface = src.win.screen.font.render("Waiting for the server to play the song", True, (255,255,255))
+            text_rect = text_surface.get_rect(center=(src.win.screen.win.get_size()[0]/2,src.win.screen.win.get_size()[1]/2)) 
+            src.win.screen.win.blit(text_surface, text_rect)
+            pygame.display.update()
+        else:
+            key = None
+            if len(src.win.setting.video_list) == 0:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.display.quit()
                         pygame.quit()
-                        exit(0)
-                    elif event.key == pygame.K_BACKSPACE:
-                        state.search = state.search[:-1]
-                    elif event.key == pygame.K_RETURN:
-                        key = "return"
-                    elif event.key == pygame.K_v and (pygame.key.get_mods() & pygame.KMOD_CTRL):
-                        if pygame.scrap.get_init():
-                            copied_text = pygame.scrap.get(pygame.SCRAP_TEXT)
-                            if copied_text:
-                                try:
-                                    copied_text = copied_text.decode('utf-8').strip('\x00')
-                                except UnicodeDecodeError:
-                                    detected = chardet.detect(copied_text)
-                                    encoding = detected['encoding']
-                                    copied_text = copied_text.decode(encoding).strip('\x00')
-                                state.search += copied_text
-                elif event.type == pygame.TEXTINPUT:
-                    state.search += event.text
-            if not key:
+                        return 
+                    elif event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_ESCAPE:
+                            if user_setting.discord_RPC:
+                                src.discord.client.RPC.close()
+                            pygame.quit()
+                            exit(0)
+                        elif event.key == pygame.K_BACKSPACE:
+                            state.search = state.search[:-1]
+                        elif event.key == pygame.K_RETURN:
+                            key = "return"
+                        elif event.key == pygame.K_v and (pygame.key.get_mods() & pygame.KMOD_CTRL):
+                            if pygame.scrap.get_init():
+                                copied_text = pygame.scrap.get(pygame.SCRAP_TEXT)
+                                if copied_text:
+                                    try:
+                                        copied_text = copied_text.decode('utf-8').strip('\x00')
+                                    except UnicodeDecodeError:
+                                        detected = chardet.detect(copied_text)
+                                        encoding = detected['encoding']
+                                        copied_text = copied_text.decode(encoding).strip('\x00')
+                                    state.search += copied_text
+                    elif event.type == pygame.TEXTINPUT:
+                        state.search += event.text
+                if not key:
+                    text_surface = src.win.screen.font.render(f"search video : {state.search}", True, (255,255,255))
+                    text_rect = text_surface.get_rect(center=(src.win.screen.win.get_size()[0]/2,src.win.screen.win.get_size()[1]/2)) 
+                    src.win.screen.win.blit(text_surface, text_rect)
+                    pygame.display.update()
+                    continue
+                elif key == "backspace":
+                    state.search = state.search[0:len(state.search)-1]
+                elif len(key) == 1:
+                    state.search = state.search + key
                 text_surface = src.win.screen.font.render(f"search video : {state.search}", True, (255,255,255))
                 text_rect = text_surface.get_rect(center=(src.win.screen.win.get_size()[0]/2,src.win.screen.win.get_size()[1]/2)) 
                 src.win.screen.win.blit(text_surface, text_rect)
                 pygame.display.update()
-                continue
-            elif key == "backspace":
-                state.search = state.search[0:len(state.search)-1]
-            elif len(key) == 1:
-                state.search = state.search + key
-            text_surface = src.win.screen.font.render(f"search video : {state.search}", True, (255,255,255))
-            text_rect = text_surface.get_rect(center=(src.win.screen.win.get_size()[0]/2,src.win.screen.win.get_size()[1]/2)) 
-            src.win.screen.win.blit(text_surface, text_rect)
-            pygame.display.update()
-            if key == "enter" or key == "return":
-                if is_playlist(state.search):
-                    video_urls = download.get_playlist_video(state.search)
-                    src.win.setting.video_list.extend(video_urls)
-                    state.search = ""
-                elif is_url(state.search):
-                    a = state.search
-                    src.win.setting.video_list.append(a)
-                    state.search = ""
-                else:
-                    src.win.screen.win.fill((0,0,0))
-                    text_surface = src.win.screen.font.render(f"Searching YouTube videos...", True, (255,255,255))
-                    text_rect = text_surface.get_rect(center=(src.win.screen.win.get_size()[0]/2,src.win.screen.win.get_size()[1]/2)) 
-                    src.win.screen.win.blit(text_surface, text_rect)
-                    pygame.display.flip()
-                    load = False
-                    choice = 0
-                    videos = download.search(state.search,10)[:5]
-                    src.win.screen.win.fill((0,0,0))
-                    pygame.display.flip()
-                    while True:
-                        key = ""
-                        for event in pygame.event.get():
-                            if event.type == pygame.QUIT:
-                                pygame.display.quit()
-                                pygame.quit()
-                                return  
-                            elif event.type == pygame.KEYDOWN:
-                                key = pygame.key.name(event.key)
-                        if key == "up":
-                            if choice != 0:
-                                choice -= 1
-                            else:
-                                choice = len(videos) - 1
-                        elif key == "down":
-                            if choice != len(videos) - 1:
-                                choice += 1
-                            else:
-                                choice = 0
-                        elif key == "escape":
+                if key == "enter" or key == "return":
+                    if is_playlist(state.search):
+                        video_urls = download.get_playlist_video(state.search)
+                        src.win.setting.video_list.extend(video_urls)
+                        state.search = ""
+                    elif is_url(state.search):
+                        a = state.search
+                        src.win.setting.video_list.append(a)
+                        state.search = ""
+                    else:
+                        src.win.screen.win.fill((0,0,0))
+                        text_surface = src.win.screen.font.render(f"Searching YouTube videos...", True, (255,255,255))
+                        text_rect = text_surface.get_rect(center=(src.win.screen.win.get_size()[0]/2,src.win.screen.win.get_size()[1]/2)) 
+                        src.win.screen.win.blit(text_surface, text_rect)
+                        pygame.display.flip()
+                        load = False
+                        choice = 0
+                        videos = download.search(state.search,10)[:5]
+                        src.win.screen.win.fill((0,0,0))
+                        pygame.display.flip()
+                        while True:
+                            key = ""
+                            for event in pygame.event.get():
+                                if event.type == pygame.QUIT:
+                                    pygame.display.quit()
+                                    pygame.quit()
+                                    return  
+                                elif event.type == pygame.KEYDOWN:
+                                    key = pygame.key.name(event.key)
+                            if key == "up":
+                                if choice != 0:
+                                    choice -= 1
+                                else:
+                                    choice = len(videos) - 1
+                            elif key == "down":
+                                if choice != len(videos) - 1:
+                                    choice += 1
+                                else:
+                                    choice = 0
+                            elif key == "escape":
+                                src.win.setting.video_list = []
+                                break
+                            src.win.screen.win.fill((0,0,0))
+                            for i, video in enumerate(videos):
+                                if i == choice:
+                                    text_surface = src.win.screen.font.render(video.title, True, (0,0,255))
+                                else:
+                                    text_surface = src.win.screen.font.render(video.title, True, (255,255,255))
+                                text_rect = text_surface.get_rect()
+                                text_rect.centerx = src.win.screen.win.get_size()[0] // 2
+                                text_rect.y = i * 30 + 50
+                                src.win.screen.win.blit(text_surface, text_rect)
+                                if not load:
+                                    pygame.display.flip()
+                            load = True
+                            pygame.display.flip()
+                            if key == "enter" or key == "return":
+                                src.win.setting.video_list.append(f"https://www.youtube.com/watch?v={videos[choice].watch_url}")
+                                break
+                trys = 0
+                while len(src.win.setting.video_list) != 0:
+                    try:
+                        run(src.win.setting.video_list[0])
+                        if once:
+                            break
+                    except Exception as e:
+                        if src.win.screen.vid == None:
+                            src.win.screen.reset((state.search_width, state.search_height))
+                        else:
+                            src.win.screen.reset((src.win.screen.vid.current_size[0],src.win.screen.vid.current_size[1]+5), vid=True)
+                        if trys >= 10:
+                            print("fail")
                             src.win.setting.video_list = []
                             break
-                        src.win.screen.win.fill((0,0,0))
-                        for i, video in enumerate(videos):
-                            if i == choice:
-                                text_surface = src.win.screen.font.render(video.title, True, (0,0,255))
-                            else:
-                                text_surface = src.win.screen.font.render(video.title, True, (255,255,255))
-                            text_rect = text_surface.get_rect()
-                            text_rect.centerx = src.win.screen.win.get_size()[0] // 2
-                            text_rect.y = i * 30 + 50
-                            src.win.screen.win.blit(text_surface, text_rect)
-                            if not load:
-                                pygame.display.flip()
-                        load = True
+                        print(f"An error occurred during playback. Trying again... ({trys}/10) > \n{e}")
+                        text_surface = src.win.screen.font.render(f"An error occurred during playback. Trying again... ({trys}/10) >", True, (255,255,255))
+                        text_surface_2 = src.win.screen.font.render(f"{e}", True, (255,255,255))
+                        text_rect = text_surface.get_rect(center=(src.win.screen.win.get_size()[0]/2,src.win.screen.win.get_size()[1]/2)) 
+                        text_rect_2 = text_surface_2.get_rect(center=(src.win.screen.win.get_size()[0]/2,src.win.screen.win.get_size()[1]/2+30)) 
+                        src.win.screen.win.blit(text_surface, text_rect)
+                        src.win.screen.win.blit(text_surface_2, text_rect_2)
                         pygame.display.flip()
-                        if key == "enter" or key == "return":
-                            src.win.setting.video_list.append(f"https://www.youtube.com/watch?v={videos[choice].watch_url}")
-                            break
-            trys = 0
-            while len(src.win.setting.video_list) != 0:
-                try:
-                    run(src.win.setting.video_list[0])
-                    if once:
-                        break
-                except Exception as e:
-                    if src.win.screen.vid == None:
-                        src.win.screen.reset((state.search_width, state.search_height))
-                    else:
-                        src.win.screen.reset((src.win.screen.vid.current_size[0],src.win.screen.vid.current_size[1]+5), vid=True)
-                    if trys >= 10:
-                        print("fail")
-                        src.win.setting.video_list = []
-                        break
-                    print(f"An error occurred during playback. Trying again... ({trys}/10) > \n{e}")
-                    text_surface = src.win.screen.font.render(f"An error occurred during playback. Trying again... ({trys}/10) >", True, (255,255,255))
-                    text_surface_2 = src.win.screen.font.render(f"{e}", True, (255,255,255))
-                    text_rect = text_surface.get_rect(center=(src.win.screen.win.get_size()[0]/2,src.win.screen.win.get_size()[1]/2)) 
-                    text_rect_2 = text_surface_2.get_rect(center=(src.win.screen.win.get_size()[0]/2,src.win.screen.win.get_size()[1]/2+30)) 
-                    src.win.screen.win.blit(text_surface, text_rect)
-                    src.win.screen.win.blit(text_surface_2, text_rect_2)
-                    pygame.display.flip()
-                    time.sleep(0.5)
-                    trys += 1
+                        time.sleep(0.5)
+                        trys += 1

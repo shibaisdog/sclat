@@ -3,7 +3,8 @@ from src import gui, nogui
 import src.win.screen
 from src.utils import user_setting
 import src.discord.client
-import locale
+import src.with_play
+import locale, threading
 from pypresence.exceptions import DiscordNotFound
 
 args = sys.argv[1:]
@@ -11,6 +12,7 @@ args = sys.argv[1:]
 nogui_op = False
 once_op = False
 playlist_op = False
+
 for arg in args:
     if not arg.startswith("--") and playlist_op:
         src.win.setting.video_list.append(arg)
@@ -22,6 +24,10 @@ for arg in args:
         once_op = True
     if arg == "--play":
         playlist_op = True
+    if arg == "--with-play-server":
+        src.with_play.Start_Server()
+    if arg == "--with-play-client":
+        src.with_play.Start_Client('192.168.0.101')
 
 try:
     if user_setting.discord_RPC:
