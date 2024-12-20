@@ -12,6 +12,7 @@ from typing import Optional
 ##############################################
 from src.utils import download
 from src.utils import user_setting
+from src.utils import subtitles
 from src import size
 import src.win.screen
 import src.win.setting
@@ -192,9 +193,34 @@ def try_play_video(url: str, max_retries: int = 10) -> None:
             print(f"Retry {retry + 1}/{max_retries}: {str(e)}")
             time.sleep(0.5)
 
+def hex_to_rgb(hex_color):
+    hex_color = hex_color.lstrip('#')
+    r = int(hex_color[0:2], 16)
+    g = int(hex_color[2:4], 16)
+    b = int(hex_color[4:6], 16)
+    
+    return r, g, b
+
+def render_subtitles(subtitles):
+    current_subtitle = []
+    for subtitle in subtitles:
+        if subtitle['start_time'] <= src.win.screen.vid.get_pos() <= subtitle['end_time']:
+            current_subtitle.append(subtitle)
+        else:
+            pass
+    for content in current_subtitle:
+        #print(f"{content['position']} / {content['line']} / {content['text']}")
+        text_surface = src.win.screen.font.render(content['text'], True, (236,82,82))
+        text_rect = text_surface.get_rect(center=(src.win.screen.win.get_width() * (int(content['position']) / 100), src.win.screen.win.get_height() * (int(content['line']) / 100)))
+        src.win.screen.win.blit(text_surface, text_rect)
+    pygame.display.flip()
+
 def run(url: str, seek = 0):
     os.environ['SDL_VIDEO_CENTERED'] = '1'
-    fns, fn = download.install(url)
+    fns, fn, vtt = download.install(url)
+    sub = None
+    if vtt:
+        sub = subtitles.parse_vtt_file(vtt)
     src.win.screen.vid = Video(fn)
     src.win.screen.reset((src.win.screen.vid.current_size[0], src.win.screen.vid.current_size[1] + 5), vid=True)
     pygame.display.set_caption(src.win.screen.vid.name)
@@ -259,6 +285,8 @@ def run(url: str, seek = 0):
                 pygame.display.set_caption(f"[{current_time:.2f}s / {total_length:.2f}s] {src.win.screen.vid.name}")
                 pygame.display.update()
                 src.win.screen.vid.draw(src.win.screen.win, (0, 0))
+            if sub:
+                render_subtitles(sub)
         pygame.time.wait(16)
     if state.cap:
         state.cap.release()

@@ -11,7 +11,7 @@ def sizeup(frame, new_size):
     if target_width < new_width:
         target_width = new_width
         target_height = int(target_width / aspect_ratio)
-    resized_frame = cv2.resize(frame, (target_width, target_height), interpolation=cv2.INTER_LINEAR)
+    resized_frame = cv2.resize(frame, (target_width, target_height), interpolation=cv2.INTER_LANCZOS4)
     if target_width < new_width:
         padding_left = (new_width - target_width) // 2
         padding_right = new_width - target_width - padding_left

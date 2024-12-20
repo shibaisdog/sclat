@@ -2,7 +2,8 @@ import os,pygame,shutil,yt_dlp
 from pytubefix import YouTube,Search
 from pytubefix.cli import on_progress
 ####################################
-from src.utils import user_setting
+from src.utils import user_setting, subtitles
+import xml.etree.ElementTree as ET
 import src.win.screen
 
 def convert_size(bytes):
@@ -64,9 +65,10 @@ def install(url:str):
     if not os.path.exists(fns):
         os.makedirs(fns)
     fn = f"{fns}/{yt.title}.mp4"
-    yt = yt.streams.filter(file_extension='mp4').get_highest_resolution()
+    yt = yt.streams.filter(progressive=True, file_extension='mp4').get_highest_resolution()
     yt.download(filename=fn)
-    return fns, fn
+    sr = install_srt(url, fns, yt.title)
+    return fns, fn, sr
 
 def install_nogui(url:str):
     os.makedirs(user_setting.file_save_dir, exist_ok=True)
@@ -76,8 +78,21 @@ def install_nogui(url:str):
     audio.download(filename=fn+".mp3")
     return fn
 
+def install_srt(url: str, fns: str, title: str):
+    ydl_opts = {
+        'writesubtitles': True,
+        'subtitleslangs': ['ko'],
+        'writeautomaticsub': True,
+        'outtmpl': f'{fns}/{title}.%(ext)s',
+        'skip_download': True,
+    }
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([url])
+    return f'{fns}/{title}.ko.vtt'
+
 def clear(folder_path):
     if os.path.exists(folder_path):
         if os.path.isdir(folder_path):
             shutil.rmtree(folder_path)
     os.makedirs(folder_path, exist_ok=True)
+
