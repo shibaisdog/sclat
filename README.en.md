@@ -31,10 +31,12 @@ See requirements.txt for more information.
 -   YouTube video playback and download functionality
 -   Real-time ASCII art conversion mode
 -   Intuitive keyboard controls
+-   YouTube subtitle loading functionality
 -   Video search functionality
 -   Volume and playback control
 -   GUI and CLI interfaces
 -   Discord RPC functionality
+-   with watch video functionality
 
 ## 🚀 How to Run
 
@@ -75,6 +77,13 @@ start.sh --once
 
 # Playlist mode
 start.sh --nogui --play [URL1] [URL2]...
+
+
+# client mode (beta)
+start.sh --with-play-client
+
+# server mode (beta)
+start.sh --with-play-server
 ```
 
 ## 🎮 Video Controls
@@ -112,6 +121,22 @@ start.sh --nogui --play [URL1] [URL2]...
 -   Paste URL with `Ctrl+V`
 -   Navigate results with arrow keys
 -   Select and play with Enter
+
+## ✨ 자막 설정
+
+**Steps to configure:**
+
+1. Open the `setting.json` file in the Sclat installation folder.
+2. Change `"Subtitle-Lang": "~"` value to your desired language:
+-  At this time, if you enter `none`, the subtitle function will be turned off.
+
+    ```json
+    {
+        "Subtitle-Lang": "ko"
+        // other settings...
+    }
+    ```
+
 
 ## ✨ Discord RPC
 

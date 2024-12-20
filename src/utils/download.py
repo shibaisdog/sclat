@@ -4,6 +4,8 @@ from pytubefix.cli import on_progress
 ####################################
 from src.utils import user_setting, subtitles
 import xml.etree.ElementTree as ET
+import src.utils
+import src.utils.user_setting
 import src.win.screen
 
 def convert_size(bytes):
@@ -67,7 +69,7 @@ def install(url:str):
     fn = f"{fns}/{yt.title}.mp4"
     yt = yt.streams.filter(progressive=True, file_extension='mp4').get_highest_resolution()
     yt.download(filename=fn)
-    sr = install_srt(url, fns, yt.title)
+    sr = install_srt(url, fns, yt.title, src.utils.user_setting.SubTitle)
     return fns, fn, sr
 
 def install_nogui(url:str):
@@ -78,17 +80,22 @@ def install_nogui(url:str):
     audio.download(filename=fn+".mp3")
     return fn
 
-def install_srt(url: str, fns: str, title: str):
+def install_srt(url: str, fns: str, title: str, lang = 'ko'):
+    if lang == '' or lang == 'none':
+        return None
     ydl_opts = {
         'writesubtitles': True,
-        'subtitleslangs': ['ko'],
+        'subtitleslangs': [lang],
         'writeautomaticsub': True,
         'outtmpl': f'{fns}/{title}.%(ext)s',
         'skip_download': True,
     }
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        ydl.download([url])
-    return f'{fns}/{title}.ko.vtt'
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([url])
+        return f'{fns}/{title}.{lang}.vtt'
+    except Exception as e:
+        return None
 
 def clear(folder_path):
     if os.path.exists(folder_path):

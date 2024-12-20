@@ -213,7 +213,7 @@ def render_subtitles(subtitles):
         text_surface = src.win.screen.font.render(content['text'], True, (236,82,82))
         text_rect = text_surface.get_rect(center=(src.win.screen.win.get_width() * (int(content['position']) / 100), src.win.screen.win.get_height() * (int(content['line']) / 100)))
         src.win.screen.win.blit(text_surface, text_rect)
-    pygame.display.flip()
+    #pygame.display.flip()
 
 def run(url: str, seek = 0):
     os.environ['SDL_VIDEO_CENTERED'] = '1'
@@ -260,6 +260,7 @@ def run(url: str, seek = 0):
                 break
             if state.ascii_mode and state.cap:
                 if ret:
+                    src.win.screen.vid.draw(src.win.screen.win, (0, 0))
                     ascii_frame = frame_to_ascii(frame, width=state.ascii_width)
                     src.win.screen.win.fill((0, 0, 0))
                     for i, (line_chars, line_colors) in enumerate(ascii_frame):
@@ -273,9 +274,8 @@ def run(url: str, seek = 0):
                     if src.with_play.server:
                         src.socket.server.seek = current_time
                     pygame.display.set_caption(f"[{current_time:.2f}s / {total_length:.2f}s] {src.win.screen.vid.name}")
-                    pygame.display.update()
-                    src.win.screen.vid.draw(src.win.screen.win, (0, 0))
             else:
+                src.win.screen.vid.draw(src.win.screen.win, (0, 0))
                 frame = size.sizeup(frame, pygame.display.get_window_size())
                 frame_surface = pygame.surfarray.make_surface(frame)
                 src.win.screen.win.blit(frame_surface, (0, 0))
@@ -283,10 +283,9 @@ def run(url: str, seek = 0):
                 if src.with_play.server:
                     src.socket.server.seek = current_time
                 pygame.display.set_caption(f"[{current_time:.2f}s / {total_length:.2f}s] {src.win.screen.vid.name}")
-                pygame.display.update()
-                src.win.screen.vid.draw(src.win.screen.win, (0, 0))
-            if sub:
-                render_subtitles(sub)
+        if sub:
+            render_subtitles(sub)
+        pygame.display.update()
         pygame.time.wait(16)
     if state.cap:
         state.cap.release()

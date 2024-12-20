@@ -1,5 +1,6 @@
 {
     "discord_RPC": true,
-    "volume": 100,
-    "file-save-dir": "./src/storage"
+    "volume": 10,
+    "file-save-dir": "./src/storage",
+    "Subtitle-Lang": "ko"
 }

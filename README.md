@@ -22,7 +22,7 @@ ASCII 아트 기능이 포함된 Python 기반 YouTube 비디오 플레이어입
 -   chardet == 5.2.0
 -   pytubefix == 7.1rc2
 -   pyvidplayer2 == 0.9.24
--   yt_dlp == 2024.8.6
+-   yt_dlp == 2024.12.13
 
 자세한 정보는 requirements.txt를 참고하세요.
 
@@ -31,10 +31,12 @@ ASCII 아트 기능이 포함된 Python 기반 YouTube 비디오 플레이어입
 -   YouTube 동영상 재생 및 다운로드 기능
 -   실시간 ASCII 아트 변환 모드
 -   직관적인 키보드 컨트롤
+-   유튜브 자막 불러오기 기능
 -   동영상 검색 기능
 -   볼륨 및 재생 제어
 -   GUI 및 CLI 인터페이스
 -   Discord RPC 기능
+-   with watch video 기능
 
 ## 🚀 실행 방법
 
@@ -75,6 +77,12 @@ start.sh --once
 
 # 재생목록 모드
 start.sh --play [URL1] [URL2]...
+
+# 클라이언트 모드 (베타버전)
+start.sh --with-play-client
+
+# 서버 모드 (베타버전)
+start.sh --with-play-server
 ```
 
 ## 🎮 비디오 컨트롤
@@ -112,6 +120,22 @@ start.sh --play [URL1] [URL2]...
 -   `Ctrl+V`로 URL 붙여넣기
 -   방향키로 결과 탐색
 -   Enter로 선택 재생
+
+## ✨ 자막 설정
+
+**설정 방법:**
+
+1. Sclat 설치 폴더에서 `setting.json` 파일을 엽니다.
+2. `"Subtitle-Lang": "~"` 값을 원하는 언어로 변경합니다:
+-  이때 `none` 을 입력할시 자막 기능이 꺼져요
+
+    ```json
+    {
+        "Subtitle-Lang": "ko"
+        // 다른 설정 값들...
+    }
+    ```
+
 
 ## ✨ Discord RPC
 
