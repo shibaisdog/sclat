@@ -23,6 +23,8 @@ def progress_function(stream, chunk, bytes_remaining):
     
     width = stream.width if stream.width else 800
     height = stream.height if stream.height else 600
+    width = width * 1.5
+    height = height * 1.5
     
     src.win.screen.reset((width, height+5))
     pygame.display.set_caption(f"Downloading: {convert_size(bytes_downloaded)} of {convert_size(total_size)} ({percentage:.2f}%)")
@@ -30,6 +32,19 @@ def progress_function(stream, chunk, bytes_remaining):
     text_rect = text_surface.get_rect(center=(int(width/2), int(height/2)))
     src.win.screen.win.blit(text_surface, text_rect)
     pygame.display.update()
+
+def progress_hook(d):
+    try:
+        width = src.win.screen.win.get_size()[0]
+        height = src.win.screen.win.get_size()[1]
+        src.win.screen.win.fill((0,0,0))
+        pygame.display.set_caption(f"Downloading: {d['_percent_str']} of {d['_speed_str']} - ETA: {d['_eta_str']}")
+        text_surface = src.win.screen.font.render(f"Downloading: {d['_percent_str']} of {d['_speed_str']} - ETA: {d['_eta_str']}", True, (255,255,255))
+        text_rect = text_surface.get_rect(center=(int(width/2), int(height/2)))
+        src.win.screen.win.blit(text_surface, text_rect)
+        pygame.display.update()
+    except Exception as e:
+        print(e)
 
 def after(a,b):
     src.win.screen.load = 2
@@ -89,6 +104,9 @@ def install_srt(url: str, fns: str, title: str, lang = 'ko'):
         'writeautomaticsub': True,
         'outtmpl': f'{fns}/{title}.%(ext)s',
         'skip_download': True,
+        'progress_hooks': [progress_hook],
+        'verbose': False,
+        'logger': None,
     }
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:

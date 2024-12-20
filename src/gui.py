@@ -16,6 +16,7 @@ from src.utils import subtitles
 from src import size
 import src.win.screen
 import src.win.setting
+import src.win.font
 import src.discord.client
 import src.with_play
 import src.socket.server
@@ -33,7 +34,7 @@ class VideoState:
     fullscreen: bool = False
     display_width: int = 0
     display_height: int = 0
-    ascii_width: int = 80 
+    ascii_width: int = 120 
     msg_start_time: float = 0
     msg_text: str = ""
 
@@ -128,7 +129,7 @@ def handle_key_event(key: str) -> None:
     elif key == "f11":
         state.fullscreen = not state.fullscreen
         if not state.fullscreen:
-            src.win.screen.reset((src.win.screen.vid.current_size[0], src.win.screen.vid.current_size[1]+5))
+            src.win.screen.reset((src.win.screen.vid.current_size[0]*1.5, src.win.screen.vid.current_size[1]*1.5+5))
         else:
             src.win.screen.reset((state.display_width,state.display_height))
     elif key == "a":
@@ -152,7 +153,7 @@ def toggle_ascii_mode():
         src.win.screen.win = pygame.display.set_mode((int(window_width), int(window_height)))
         state.font = pygame.font.SysFont("Courier", state.font_size)
     else:
-        src.win.screen.reset((src.win.screen.vid.current_size[0], src.win.screen.vid.current_size[1]+5), vid=True)
+        src.win.screen.reset((src.win.screen.vid.current_size[0]*1.5, src.win.screen.vid.current_size[1]*1.5+5), vid=True)
     os.environ['SDL_VIDEO_CENTERED'] = '1'
 
 def draw_overlay(current_time: float):
@@ -209,12 +210,19 @@ def render_subtitles(subtitles):
         else:
             pass
     for content in current_subtitle:
-        #print(f"{content['position']} / {content['line']} / {content['text']}")
+        #if content['size'] == None:
+        #   content['size'] = 25
+        #if int(content['size']) > 25:
+        #    content['size'] = int(int(content['size']) * 0.75)
+        #else:
+        #    content['size'] = 25
+        content['size'] = 25
+        font = src.win.font.get(content['size'])
         if '\n' in content['text']:
             i = 0
             for line in (content['text'].split('\n'))[::-1]:
-                text_surface = src.win.screen.font.render(line, True, (236,82,82))
-                text_rect = text_surface.get_rect(center=(src.win.screen.win.get_width() * (int(content['position']) / 100), src.win.screen.win.get_height() * (int(content['line']) / 100) - i * 30))
+                text_surface = font.render(line, True, (236,82,82))
+                text_rect = text_surface.get_rect(center=(src.win.screen.win.get_width() * (int(content['position']) / 100), src.win.screen.win.get_height() * (int(content['line']) / 100) - (i * (content['size'] + 11))))
                 padding = 2
                 rect_width = text_rect.width + padding * 2
                 rect_height = text_rect.height + padding * 2
@@ -227,7 +235,7 @@ def render_subtitles(subtitles):
                 src.win.screen.win.blit(text_surface, text_rect)
                 i += 1
         else:
-            text_surface = src.win.screen.font.render(content['text'], True, (236,82,82))
+            text_surface = font.render(content['text'], True, (236,82,82))
             text_rect = text_surface.get_rect(center=(src.win.screen.win.get_width() * (int(content['position']) / 100), src.win.screen.win.get_height() * (int(content['line']) / 100)))
             padding = 2
             rect_width = text_rect.width + padding * 2
@@ -252,7 +260,7 @@ def run(url: str, seek = 0):
             sub = None
             vtt = None
     src.win.screen.vid = Video(fn)
-    src.win.screen.reset((src.win.screen.vid.current_size[0], src.win.screen.vid.current_size[1] + 5), vid=True)
+    src.win.screen.reset((src.win.screen.vid.current_size[0]*1.5, src.win.screen.vid.current_size[1]*1.5 + 5), vid=True)
     pygame.display.set_caption(src.win.screen.vid.name)
     src.win.screen.vid.set_volume(user_setting.volume / 100)
     src.win.screen.vid.seek(seek)
@@ -344,7 +352,7 @@ def wait(once):
     elif src.win.screen.vid is None:
         src.win.screen.reset((state.search_width, state.search_height))
     else:
-        src.win.screen.reset((src.win.screen.vid.current_size[0], src.win.screen.vid.current_size[1] + 5), vid=True)
+        src.win.screen.reset((src.win.screen.vid.current_size[0]*1.5, src.win.screen.vid.current_size[1]*1.5 + 5), vid=True)
     pygame.scrap.init()
     icon = pygame.image.load("./asset/sclatIcon.png")
     pygame.display.set_icon(icon)
@@ -526,7 +534,7 @@ def wait(once):
                         if src.win.screen.vid == None:
                             src.win.screen.reset((state.search_width, state.search_height))
                         else:
-                            src.win.screen.reset((src.win.screen.vid.current_size[0],src.win.screen.vid.current_size[1]+5), vid=True)
+                            src.win.screen.reset((src.win.screen.vid.current_size[0]*1.5,src.win.screen.vid.current_size[1]*1.5+5), vid=True)
                         if trys >= 10:
                             print("fail")
                             src.win.setting.video_list = []
