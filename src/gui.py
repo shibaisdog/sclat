@@ -220,7 +220,11 @@ def run(url: str, seek = 0):
     fns, fn, vtt = download.install(url)
     sub = None
     if vtt:
-        sub = subtitles.parse_vtt_file(vtt)
+        try:
+            sub = subtitles.parse_vtt_file(vtt)
+        except Exception as e:
+            sub = None
+            vtt = None
     src.win.screen.vid = Video(fn)
     src.win.screen.reset((src.win.screen.vid.current_size[0], src.win.screen.vid.current_size[1] + 5), vid=True)
     pygame.display.set_caption(src.win.screen.vid.name)
