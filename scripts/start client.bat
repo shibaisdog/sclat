@@ -1,4 +1,5 @@
 @echo off
+cd ../
 where python3 >nul 2>nul
 IF %ERRORLEVEL% EQU 0 (
     set NODE=python3
@@ -6,7 +7,7 @@ IF %ERRORLEVEL% EQU 0 (
     set NODE=python
 )
 if exist "sclat-venv" (
-    call sclat-venv\Scripts\activate
+    call ..\sclat-venv\Scripts\activate
 )
-%NODE% ./main.py %*
+%NODE% sclat/sclat.py --with-play-client %*
 deactivate

@@ -1,4 +1,5 @@
 @echo off
+cd ../
 where python3 >nul 2>nul
 IF %ERRORLEVEL% EQU 0 (
     set NODE=python3

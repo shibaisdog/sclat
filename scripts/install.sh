@@ -1,5 +1,6 @@
 #!/bin/bash
 set +x
+cd ../
 if command -v python3 > /dev/null 2>&1; then
     NODE=python3
 else

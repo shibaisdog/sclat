@@ -1,10 +1,11 @@
-import src.utils.json as json
-json_file_path = "./setting.json"
+from setting import json
+
+json_file_path = "./setting/setting.json"
 def init_file():
     data = {}
     data['discord_RPC'] = True
     data['volume'] = 10
-    data['file-save-dir'] = './src/storage'
+    data['file-save-dir'] = './asset/storage'
     data['Subtitle-Lang'] = 'ko'
     return data
 def change_setting_data(key:str,value):

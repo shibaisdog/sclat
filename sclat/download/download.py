@@ -2,11 +2,8 @@ import os,pygame,shutil,yt_dlp
 from pytubefix import YouTube,Search
 from pytubefix.cli import on_progress
 ####################################
-from src.utils import user_setting, subtitles
-import xml.etree.ElementTree as ET
-import src.utils
-import src.utils.user_setting
-import src.win.screen
+from setting import setting as user_setting
+import gui.screen
 
 def convert_size(bytes):
     for unit in ['Byte', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB']:
@@ -19,35 +16,35 @@ def progress_function(stream, chunk, bytes_remaining):
     bytes_downloaded = total_size - bytes_remaining
     percentage = (bytes_downloaded / total_size) * 100
     on_progress(stream, chunk, bytes_remaining)
-    src.win.screen.load = 1
+    gui.screen.load = 1
     
     width = stream.width if stream.width else 800
     height = stream.height if stream.height else 600
     width = width * 1.5
     height = height * 1.5
     
-    src.win.screen.reset((width, height+5))
+    gui.screen.reset((width, height+5))
     pygame.display.set_caption(f"Downloading: {convert_size(bytes_downloaded)} of {convert_size(total_size)} ({percentage:.2f}%)")
-    text_surface = src.win.screen.font.render(f"Downloading: {convert_size(bytes_downloaded)} of {convert_size(total_size)} ({percentage:.2f}%)", True, (255,255,255))
+    text_surface = gui.screen.font.render(f"Downloading: {convert_size(bytes_downloaded)} of {convert_size(total_size)} ({percentage:.2f}%)", True, (255,255,255))
     text_rect = text_surface.get_rect(center=(int(width/2), int(height/2)))
-    src.win.screen.win.blit(text_surface, text_rect)
+    gui.screen.win.blit(text_surface, text_rect)
     pygame.display.update()
 
 def progress_hook(d):
     try:
-        width = src.win.screen.win.get_size()[0]
-        height = src.win.screen.win.get_size()[1]
-        src.win.screen.win.fill((0,0,0))
+        width = gui.screen.win.get_size()[0]
+        height = gui.screen.win.get_size()[1]
+        gui.screen.win.fill((0,0,0))
         pygame.display.set_caption(f"Downloading: {d['_percent_str']} of {d['_speed_str']} - ETA: {d['_eta_str']}")
-        text_surface = src.win.screen.font.render(f"Downloading: {d['_percent_str']} of {d['_speed_str']} - ETA: {d['_eta_str']}", True, (255,255,255))
+        text_surface = gui.screen.font.render(f"Downloading: {d['_percent_str']} of {d['_speed_str']} - ETA: {d['_eta_str']}", True, (255,255,255))
         text_rect = text_surface.get_rect(center=(int(width/2), int(height/2)))
-        src.win.screen.win.blit(text_surface, text_rect)
+        gui.screen.win.blit(text_surface, text_rect)
         pygame.display.update()
     except Exception as e:
         print(e)
 
 def after(a,b):
-    src.win.screen.load = 2
+    gui.screen.load = 2
 
 def search(q:str,result:int):
     list = Search(query=q)
@@ -84,7 +81,7 @@ def install(url:str):
     fn = f"{fns}/{yt.title}.mp4"
     yt = yt.streams.filter(progressive=True, file_extension='mp4').get_highest_resolution()
     yt.download(filename=fn)
-    sr = install_srt(url, fns, yt.title, src.utils.user_setting.SubTitle)
+    sr = install_srt(url, fns, yt.title, user_setting.SubTitle)
     return fns, fn, sr
 
 def install_nogui(url:str):

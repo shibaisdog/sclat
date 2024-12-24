@@ -1,10 +1,8 @@
 import socket, json, time
-import src.gui
-import src.with_play
+from gui import with_play
 
 client = None
 play = False
-
 url = ''
 seek = 0
 
@@ -20,21 +18,21 @@ def start_client(server_ip):
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         client.connect((server_ip, 12377))
-        src.with_play.c_server_on = True
+        with_play.c_server_on = True
     except socket.gaierror as e:
         print(f"Error resolving IP: {e}")
-        src.with_play.c_server_ip = ''
-        src.with_play.c_server_on = False
+        with_play.c_server_ip = ''
+        with_play.c_server_on = False
         return
     except ConnectionRefusedError as e:
         print(f"Connection failed: {e}")
-        src.with_play.c_server_ip = ''
-        src.with_play.c_server_on = False
+        with_play.c_server_ip = ''
+        with_play.c_server_on = False
         return
     except Exception as e:
         print(f"An error occurred: {e}")
-        src.with_play.c_server_ip = ''
-        src.with_play.c_server_on = False
+        with_play.c_server_ip = ''
+        with_play.c_server_on = False
         return
     try:
         playinfo()

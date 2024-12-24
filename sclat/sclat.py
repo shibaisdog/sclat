@@ -1,10 +1,8 @@
 import sys,time
-from src import gui, nogui
-import src.win.screen
-from src.utils import user_setting
-import src.discord.client
-import src.with_play
-import locale, threading
+from gui import gui, nogui, with_play, screen, cache
+import discord_rpc.client
+import locale
+from setting import setting as user_setting
 from pypresence.exceptions import DiscordNotFound
 
 args = sys.argv[1:]
@@ -15,7 +13,7 @@ playlist_op = False
 
 for arg in args:
     if not arg.startswith("--") and playlist_op:
-        src.win.setting.video_list.append(arg)
+        cache.video_list.append(arg)
     elif arg.startswith("--") and arg != "--play":
         playlist_op = False
     if arg == "--nogui":
@@ -25,17 +23,17 @@ for arg in args:
     if arg == "--play":
         playlist_op = True
     if arg == "--with-play-server":
-        src.with_play.Start_Server()
+        with_play.Start_Server()
     if arg == "--with-play-client":
-        src.with_play.client = True
+        with_play.client = True
 
 try:
     if user_setting.discord_RPC:
-        src.discord.client.RPC.connect()
-        src.discord.client.update(time.time(),"waiting...")
+        discord_rpc.client.RPC.connect()
+        discord_rpc.client.update(time.time(),"waiting...")
 
     while True:
-        src.win.screen.load = 0
+        screen.load = 0
         if nogui_op:
             nogui.wait(once_op)
             break
@@ -53,4 +51,4 @@ except DiscordNotFound:
     sys.exit(1)
 
 if user_setting.discord_RPC:
-    src.discord.client.RPC.close()
+    discord_rpc.client.RPC.close()

@@ -1,8 +1,7 @@
+from sockets import setting, user
 import socket
 import threading
 import json
-import src.socket.setting as setting
-import src.socket.user as user
 
 playurl = ''
 seek = 0

@@ -8,7 +8,7 @@ ASCII 아트 기능이 포함된 Python 기반 YouTube 비디오 플레이어입
 
 ## 🌐 언어 | Language
 
-[한국어](README.md) | [English](README.en.md)
+[한국어](README.md) | [English](./docs/README.en.md)
 
 ## ⚙️ 요구사항
 
@@ -121,11 +121,11 @@ start.sh --with-play-server
 -   방향키로 결과 탐색
 -   Enter로 선택 재생
 
-## ✨ 자막 설정
+## 💬 자막 설정
 
 **설정 방법:**
 
-1. Sclat 설치 폴더에서 `setting.json` 파일을 엽니다.
+1. Sclat 설치 폴더에서 `setting/setting.json` 파일을 엽니다.
 2. `"Subtitle-Lang": "~"` 값을 원하는 언어로 변경합니다:
 -  이때 `none` 을 입력할시 자막 기능이 꺼져요
 
@@ -151,11 +151,11 @@ Discord RPC 기능을 사용하려면 컴퓨터에서 Discord 프로그램을 �
 
 ### Discord RPC 끄는 방법
 
-Discord RPC 기능을 비활성화하려면 `setting.json` 파일에서 `discord_RPC` 값을 `false`로 변경하십시오. 기본값은 `true`입니다.
+Discord RPC 기능을 비활성화하려면 `setting/setting.json` 파일에서 `discord_RPC` 값을 `false`로 변경하십시오. 기본값은 `true`입니다.
 
 **설정 방법:**
 
-1. Sclat 설치 폴더에서 `setting.json` 파일을 엽니다.
+1. Sclat 설치 폴더에서 `setting/setting.json` 파일을 엽니다.
 2. `"discord_RPC": true`를 `"discord_RPC": false`로 변경합니다:
 
     ```json

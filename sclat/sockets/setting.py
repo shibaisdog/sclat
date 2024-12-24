@@ -1,5 +1,6 @@
-import src.utils.json as json
-json_file_path = "./server.json"
+from setting import json
+
+json_file_path = "./setting/server.json"
 max_client = 0
 last_server = ''
 def init_file():

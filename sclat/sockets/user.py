@@ -1,4 +1,5 @@
 import socket, requests
+
 def get_external_ip():
     try:
         response = requests.get("https://api.ipify.org?format=json")

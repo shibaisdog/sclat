@@ -1,15 +1,16 @@
 from moviepy.editor import AudioFileClip
 import pygame,time,os,re
 ############################################
-from src.utils import download,user_setting
-import src.win.setting
-import src.discord.client
+from download import download
+from setting import setting as user_setting
+import gui.cache
+import discord_rpc.client
 
 def is_url(url: str) -> bool:
-    match = re.search(src.win.setting.SEARCH_PATTERN, url)
+    match = re.search(gui.cache.SEARCH_PATTERN, url)
     return bool(match)
 def is_playlist(url: str) -> bool:
-    match = re.search(src.win.setting.PLAYLIST_SEARCH_PATTERN, url)
+    match = re.search(gui.cache.PLAYLIST_SEARCH_PATTERN, url)
     return bool(match)
 
 def run(url:str):
@@ -20,7 +21,7 @@ def run(url:str):
     mp3_path = fn + ".mp3"
     wav_path = fn + ".wav"
     if user_setting.discord_RPC:
-        src.discord.client.update(time.time(), fn.replace(user_setting.file_save_dir,''))
+        discord_rpc.client.update(time.time(), fn.replace(user_setting.file_save_dir,''))
     if not os.path.exists(mp3_path):
         print(f"Error: MP3 file not found at {mp3_path}")
         return  
@@ -41,22 +42,22 @@ def run(url:str):
     except Exception as e:
         print(f"Error processing audio: {str(e)}")
     finally:
-        src.win.setting.video_list.remove(src.win.setting.video_list[0])
+        gui.cache.video_list.remove(gui.cache.video_list[0])
     
 def wait(once):
     while True:
-        if len(src.win.setting.video_list) == 0:
+        if len(gui.cache.video_list) == 0:
             if user_setting.discord_RPC:
-                src.discord.client.update(time.time(),"waiting...")
+                discord_rpc.client.update(time.time(),"waiting...")
             print("")
             search = input("Please enter the 'Video Title or URL or Playlist URL' to play the video : ")
         else:
-            search = src.win.setting.video_list[0]
+            search = gui.cache.video_list[0]
         if is_playlist(search):
             video_urls = download.get_playlist_video(search)
-            src.win.setting.video_list.extend(video_urls)
+            gui.cache.video_list.extend(video_urls)
         elif is_url(search):
-            src.win.setting.video_list.append(search)
+            gui.cache.video_list.append(search)
         else:
             print("Searching YouTube videos...")
             videos = download.search(search,10)[:5]
@@ -69,14 +70,14 @@ def wait(once):
                     if len(videos) < int_value or int_value <= 0:
                         print(f"You can only input from `1` to {len(videos)}")
                         return
-                    src.win.setting.video_list.append(f"https://www.youtube.com/watch?v={videos[int_value-1].watch_url}")
+                    gui.cache.video_list.append(f"https://www.youtube.com/watch?v={videos[int_value-1].watch_url}")
                     break
                 except ValueError:
                     print("The value entered is not an integer")
         trys = 0
-        while len(src.win.setting.video_list) != 0:
+        while len(gui.cache.video_list) != 0:
             try:
-                run(src.win.setting.video_list[0])
+                run(gui.cache.video_list[0])
                 if once:
                     break
             except Exception as e:
